@@ -1,0 +1,1 @@
+One OpenCode prompt, seven hops: Istio mTLS, a fail-closed budget check, PII and secret redaction, a complexity router that picks between Luna, Sonnet and Opus, then retries, fallbacks and Langfuse traces. All of that sits behind the same OpenAI-compatible provider on PEX, so the client needs zero changes.

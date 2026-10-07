@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-themes="tokyo-night,corporate-clean,nord">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Platform | Enexis DevDay</title>
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/fonts.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/base.css">
+  <link rel="stylesheet" id="theme-link" href="../.agents/skills/html-ppt/assets/themes/tokyo-night.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/animations/animations.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-workshop">
+<div class="deck">
+
+  <section class="slide" data-title="Promise">
+    <p class="kicker">03 / the rule for using AI</p>
+    <h2 class="h2">AI helps with tasks.<br><span class="muted">People make the decisions.</span></h2>
+    <div class="promise-grid mt-l">
+       <div class="promise-number">01</div><div><b>AI can speed up tasks</b><p>Context gathering, alternatives, starter code, test ideas, and review prompts.</p></div>
+       <div class="promise-number">02</div><div><b>People decide</b><p>Intent, boundaries, trade-offs, acceptance criteria, and output rules.</p></div>
+       <div class="promise-number">03</div><div><b>Checks and guardrails</b><p>Tests and review show what changed. Automatic quality gates keep AI-generated code within the team's standards.</p></div>
+       <div class="promise-number">04</div><div><b>Use resources responsibly</b><p>Choose the model and context for the task. Keep context small and do not use the most expensive model for every request.</p></div>
+    </div>
+    <div class="quote mt-l">AI can propose a change. The team decides whether it stays.</div>
+    <aside class="notes">
+       <p>Here is the rule for this session: <strong>AI helps with the work; people own the problem, the decisions, and the checks</strong>.</p>
+       <p>An agent is useful for gathering context, suggesting options, writing a first test, or finding a suspicious edge case. But the agent does not know which interpretation the business actually wants unless we make that visible. It also cannot decide whether an internal fixture field is safe to expose to an event coordinator.</p>
+       <p>So we will treat every generated result as a proposal. We keep a change when the behavior is written down, the implementation has tests, another person or tool has reviewed it, and automatic quality gates can run again.</p>
+       <p>There is also a cost to each request. Choose a model for the task, keep the context clean and small, and avoid spending the most expensive model and the most tokens when a smaller request will do.</p>
+    </aside>
+  </section>
+
+  <section class="slide platform-team-slide" data-title="AI Platform Team introduction">
+    <p class="kicker">Meet the team</p>
+    <h2 class="h2">AI Platform Team<br><span class="accent-text">introduction.</span></h2>
+    <ul class="platform-team-names mt-l" aria-label="AI Platform Team members">
+      <li>Dennis van Dijk</li>
+      <li>Folkert Jansen</li>
+      <li>Jeffrey van der Linden</li>
+      <li>Jim Kroon</li>
+      <li>Joost Franssen <small>(call him Frans, please)</small></li>
+    </ul>
+    <aside class="notes"><p>Introduce the AI Platform Team before the platform section. Members: Dennis van Dijk, Folkert Jansen, Jeffrey van der Linden, Jim Kroon, and Joost Franssen. Call Joost Frans.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Eén ingang voor AI" data-story-state="start">
+    <div class="story-stage story-start-stage">
+      <p class="story-kicker">04 / de AI-platformroute</p>
+      <div class="story-start-mark" data-morph-id="litellm">
+        <div class="logo-badge logo-badge-large">
+          <img src="images/platform-logos/litellm.svg" alt="LiteLLM" data-logo-img>
+          <span class="logo-fallback" hidden>LiteLLM</span>
+        </div>
+      </div>
+      <h2 class="story-hero-title">Eén ingang voor AI</h2>
+      <p class="story-hero-subtitle">Veilig en beheersbaar naar meerdere modelplatformen</p>
+      <p class="story-prompt mono">→ bouw het aanbod rond één gateway</p>
+    </div>
+    <aside class="notes"><p>LiteLLM is onze centrale AI-gateway: gebruikers krijgen één ingang, terwijl wij daarachter meerdere modelaanbieders veilig en beheersbaar ontsluiten.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Cloud- en modelplatformen" data-story-state="overview">
+    <div class="story-stage">
+      <div class="story-heading">
+        <p class="story-kicker">05 / het aanbod achter de gateway</p>
+        <h2 class="story-title">Eén ingang. Meerdere platformen.</h2>
+        <p class="story-lede">LiteLLM ontsluit een goedgekeurd aanbod — niet automatisch alles wat een provider aanbiedt.</p>
+      </div>
+      <div class="overview-map">
+        <div class="gateway-node" data-morph-id="litellm">
+          <div class="logo-badge"><img src="images/platform-logos/litellm.svg" alt="LiteLLM" data-logo-img><span class="logo-fallback" hidden>LiteLLM</span></div>
+          <strong>LiteLLM</strong><small>centrale AI-gateway</small>
+        </div>
+        <div class="provider-rail" data-morph-id="provider-rail">
+          <div class="provider-connector" data-morph-id="connector"></div>
+          <div class="provider-card" data-morph-id="azure-card">
+            <div class="provider-logo logo-badge"><img src="images/platform-logos/azure.svg" alt="Microsoft Azure" data-logo-img><span class="logo-fallback" hidden>Azure</span></div>
+            <strong>Azure</strong><small>goedgekeurd modelaanbod</small>
+          </div>
+          <div class="provider-card" data-morph-id="bedrock-card">
+            <div class="provider-logo logo-badge"><img src="images/platform-logos/aws.svg" alt="Amazon Web Services" data-logo-img><span class="logo-fallback" hidden>AWS Bedrock</span></div>
+            <strong>AWS Bedrock</strong><small>goedgekeurd modelaanbod</small>
+          </div>
+          <div class="provider-card" data-morph-id="mistral-card">
+            <div class="provider-logo logo-badge"><img src="images/platform-logos/mistral.svg" alt="Mistral AI" data-logo-img><span class="logo-fallback" hidden>Mistral</span></div>
+            <strong>Mistral</strong><small>goedgekeurd modelaanbod</small>
+          </div>
+        </div>
+      </div>
+      <div class="story-bottom-callout"><span class="mono">BETEKENIS VAN DE VERBINDING</span><strong>goedgekeurd aanbod dat via LiteLLM ontsloten kan worden</strong></div>
+    </div>
+    <aside class="notes"><p>De drie kaarten staan tegelijk in beeld. De verbinding betekent goedgekeurd aanbod: het platform levert modellen die via LiteLLM ontsloten kunnen worden. Dit is niet de volledige provider-catalogus en niet automatisch beschikbaar voor iedere gebruiker.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Toegang en modelaanvragen" data-story-state="access">
+    <div class="story-stage story-detail-stage">
+      <div class="story-heading">
+        <p class="story-kicker">06 / onderwerp 01 — toegang</p>
+        <h2 class="story-title">Van aanvraag naar beschikbaar aanbod.</h2>
+        <p class="story-lede">De gebruiker krijgt één ingang; het goedgekeurde modelaanbod wordt daarachter beheerd.</p>
+      </div>
+      <div class="story-context-strip">
+        <span class="context-gateway" data-morph-id="litellm"><b>LiteLLM</b><small>één ingang</small></span><i>→</i>
+        <span data-morph-id="ctx-azure">Azure</span><span data-morph-id="ctx-bedrock">AWS Bedrock</span><span data-morph-id="ctx-mistral">Mistral</span>
+      </div>
+      <div class="detail-grid">
+        <article class="detail-card" data-morph-id="azure-card"><div class="detail-card-head"><span class="logo-badge logo-badge-small"><img src="images/platform-logos/azure.svg" alt="Azure" data-logo-img><span class="logo-fallback" hidden>Azure</span></span><strong>Azure</strong></div><p>Goedgekeurde modellen worden via LiteLLM beschikbaar gemaakt.</p><ul><li>aanvraag beoordelen</li><li>aanbod ontsluiten</li></ul></article>
+        <article class="detail-card" data-morph-id="bedrock-card"><div class="detail-card-head"><span class="logo-badge logo-badge-small"><img src="images/platform-logos/aws.svg" alt="AWS Bedrock" data-logo-img><span class="logo-fallback" hidden>Bedrock</span></span><strong>AWS Bedrock</strong></div><p>Goedgekeurde modellen worden via LiteLLM beschikbaar gemaakt.</p><ul><li>aanvraag beoordelen</li><li>aanbod ontsluiten</li></ul></article>
+        <article class="detail-card" data-morph-id="mistral-card"><div class="detail-card-head"><span class="logo-badge logo-badge-small"><img src="images/platform-logos/mistral.svg" alt="Mistral" data-logo-img><span class="logo-fallback" hidden>Mistral</span></span><strong>Mistral</strong></div><p>Goedgekeurde modellen worden via LiteLLM beschikbaar gemaakt.</p><ul><li>aanvraag beoordelen</li><li>aanbod ontsluiten</li></ul></article>
+      </div>
+      <div class="detail-result"><span class="mono">RESULTAAT</span><strong>Goedgekeurde modellen worden via LiteLLM beschikbaar gemaakt.</strong></div>
+    </div>
+    <aside class="notes"><p>We tonen bewust alleen het resultaat van het toegangsproces. Geen interne formulieren of URLs: goedgekeurde modellen worden via LiteLLM beschikbaar gemaakt.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Cloud- en modelplatformen — overzicht" data-story-state="overview-access-back">
+    <div class="story-stage">
+      <div class="story-heading compact"><p class="story-kicker">07 / terug naar het overzicht</p><h2 class="story-title">Eén ingang. Meerdere platformen.</h2></div>
+      <div class="overview-map">
+        <div class="gateway-node" data-morph-id="litellm"><div class="logo-badge"><img src="images/platform-logos/litellm.svg" alt="LiteLLM" data-logo-img><span class="logo-fallback" hidden>LiteLLM</span></div><strong>LiteLLM</strong><small>centrale AI-gateway</small></div>
+        <div class="provider-rail" data-morph-id="provider-rail"><div class="provider-connector" data-morph-id="connector"></div>
+          <div class="provider-card" data-morph-id="azure-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/azure.svg" alt="Azure" data-logo-img><span class="logo-fallback" hidden>Azure</span></div><strong>Azure</strong><small>goedgekeurd modelaanbod</small></div>
+          <div class="provider-card" data-morph-id="bedrock-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/aws.svg" alt="AWS Bedrock" data-logo-img><span class="logo-fallback" hidden>Bedrock</span></div><strong>AWS Bedrock</strong><small>goedgekeurd modelaanbod</small></div>
+          <div class="provider-card" data-morph-id="mistral-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/mistral.svg" alt="Mistral" data-logo-img><span class="logo-fallback" hidden>Mistral</span></div><strong>Mistral</strong><small>goedgekeurd modelaanbod</small></div>
+        </div>
+      </div>
+      <div class="story-bottom-callout"><span class="mono">VOLGENDE VRAAG</span><strong>Welke capaciteit en modellen zijn nodig?</strong></div>
+    </div>
+    <aside class="notes"><p>Na de toegangszoom keren we terug naar het overzicht. De volgende vraag is capaciteit en modelaanbod.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Cloud- en modelplatformen — overzicht" data-story-state="overview-quota">
+    <div class="story-stage"><div class="story-heading compact"><p class="story-kicker">09 / terug naar het overzicht</p><h2 class="story-title">Het aanbod is meer dan capaciteit.</h2></div><div class="overview-map"><div class="gateway-node" data-morph-id="litellm"><div class="logo-badge"><img src="images/platform-logos/litellm.svg" alt="LiteLLM" data-logo-img><span class="logo-fallback" hidden>LiteLLM</span></div><strong>LiteLLM</strong><small>centrale AI-gateway</small></div><div class="provider-rail" data-morph-id="provider-rail"><div class="provider-connector" data-morph-id="connector"></div><div class="provider-card" data-morph-id="azure-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/azure.svg" alt="Azure" data-logo-img><span class="logo-fallback" hidden>Azure</span></div><strong>Azure</strong><small>goedgekeurd modelaanbod</small></div><div class="provider-card" data-morph-id="bedrock-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/aws.svg" alt="AWS Bedrock" data-logo-img><span class="logo-fallback" hidden>Bedrock</span></div><strong>AWS Bedrock</strong><small>goedgekeurd modelaanbod</small></div><div class="provider-card" data-morph-id="mistral-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/mistral.svg" alt="Mistral" data-logo-img><span class="logo-fallback" hidden>Mistral</span></div><strong>Mistral</strong><small>goedgekeurd modelaanbod</small></div></div></div><div class="story-bottom-callout"><span class="mono">VOLGENDE VRAAG</span><strong>Welke modelkeuze past bij de taak?</strong></div></div>
+    <aside class="notes"><p>Terug naar het overzicht. Nu bekijken we het modelaanbod en de manier waarop gebruikers een model kiezen.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Cloud- en modelplatformen — overzicht" data-story-state="overview-offer">
+    <div class="story-stage"><div class="story-heading compact"><p class="story-kicker">11 / terug naar het overzicht</p><h2 class="story-title">Van keuze naar een technische route.</h2></div><div class="overview-map"><div class="gateway-node" data-morph-id="litellm"><div class="logo-badge"><img src="images/platform-logos/litellm.svg" alt="LiteLLM" data-logo-img><span class="logo-fallback" hidden>LiteLLM</span></div><strong>LiteLLM</strong><small>centrale AI-gateway</small></div><div class="provider-rail" data-morph-id="provider-rail"><div class="provider-connector" data-morph-id="connector"></div><div class="provider-card" data-morph-id="azure-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/azure.svg" alt="Azure" data-logo-img><span class="logo-fallback" hidden>Azure</span></div><strong>Azure</strong><small>goedgekeurd modelaanbod</small></div><div class="provider-card" data-morph-id="bedrock-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/aws.svg" alt="AWS Bedrock" data-logo-img><span class="logo-fallback" hidden>Bedrock</span></div><strong>AWS Bedrock</strong><small>goedgekeurd modelaanbod</small></div><div class="provider-card" data-morph-id="mistral-card"><div class="provider-logo logo-badge"><img src="images/platform-logos/mistral.svg" alt="Mistral" data-logo-img><span class="logo-fallback" hidden>Mistral</span></div><strong>Mistral</strong><small>goedgekeurd modelaanbod</small></div></div></div><div class="story-bottom-callout"><span class="mono">VOLGENDE LAAG</span><strong>Wat gebeurt er met een echte request?</strong></div></div>
+    <aside class="notes"><p>Na toegang, quota en modelaanbod leggen we de volledige technische route ruimtelijk uit.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Technische request-flow" data-story-state="technical-flow">
+    <div class="story-stage story-flow-stage"><div class="story-heading"><p class="story-kicker">12 / de volledige technische route</p><h2 class="story-title">Van gebruiker naar model — en terug.</h2><p class="story-lede">De route is lineair; infrastructuur en observability liggen ernaast.</p></div><div class="flow-route"><div data-morph-id="flow-user"><span>01</span><b>Gebruiker</b></div><i>→</i><div data-morph-id="flow-opencode"><span>02</span><b>OpenCode</b></div><i>→</i><div data-morph-id="flow-api"><span>03</span><b>API-toegang</b></div><i>→</i><div class="flow-gateway" data-morph-id="litellm"><span>04</span><b>LiteLLM</b></div><i>→</i><div data-morph-id="flow-guard"><span>05</span><b>PII / guardrails</b></div><i>→</i><div data-morph-id="flow-router"><span>06</span><b>router / modelalias</b></div></div><div class="flow-lower"><div class="provider-targets" data-morph-id="provider-rail"><span>07 providerplatform</span><b>Azure · AWS Bedrock · Mistral</b><span>08 concreet model</span><b>goedgekeurde modelvariant</b></div><div class="infra-layer" data-morph-id="infra"><span>INFRASTRUCTUUR ONDER LITELLM</span><strong>PEX / Kubernetes</strong><small>runtime &amp; schaalbaarheid</small></div><div class="flow-return" data-morph-id="flow-answer"><span>09</span><b>antwoord terug naar OpenCode</b></div></div><div class="flow-footnote mono">logs &amp; usage = observatie-zijstroom, geen requeststap</div></div>
+    <aside class="notes"><p>De volledige route: Gebruiker naar OpenCode, API-toegang, LiteLLM, PII/guardrails, router/modelalias, providerplatform, concreet model en antwoord terug naar OpenCode. PEX/Kubernetes is infrastructuur onder LiteLLM. Logs en usage zijn een observatie-zijstroom, geen requeststap.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Request-flow — beschermde route" data-story-state="flow-accent">
+    <div class="story-stage story-flow-stage"><div class="story-heading"><p class="story-kicker">13 / de route in lagen</p><h2 class="story-title">Eerst beschermen. Dan routeren.</h2><p class="story-lede">Elke laag heeft een eigen verantwoordelijkheid voordat het request een model bereikt.</p></div><div class="layered-flow"><div class="layer-row muted-layer"><span class="layer-label">REQUEST</span><strong>Gebruiker</strong><i>→</i><strong>OpenCode</strong><i>→</i><strong>API-toegang</strong></div><div class="layer-row accent-layer" data-morph-id="litellm"><span class="layer-label">GATEWAY</span><strong>LiteLLM</strong><small>één ingang, policies en routing</small></div><div class="layer-row accent-layer second"><span class="layer-label">BESCHERMING</span><strong>PII / guardrails</strong><i>→</i><strong>router / modelalias</strong><small>veiligheid en keuze vóór provider</small></div><div class="layer-row provider-layer" data-morph-id="provider-rail"><span class="layer-label">AANBOD</span><strong>providerplatform</strong><i>→</i><strong>concreet model</strong><small>Azure · AWS Bedrock · Mistral</small></div><div class="layer-row muted-layer"><span class="layer-label">RESPONSE</span><strong>antwoord</strong><i>→</i><strong>OpenCode</strong></div></div><div class="flow-focus"><span class="mono">FOCUS</span><strong>De gateway maakt de ingang centraal — de verantwoordelijkheden erachter blijven zichtbaar.</strong></div></div>
+    <aside class="notes"><p>We accentueren de beschermde route: API-toegang naar LiteLLM, PII/guardrails en router/modelalias, daarna providerplatform en concreet model.</p></aside>
+  </section>
+
+  <section class="slide platform-story-slide" data-title="Antwoord, logs en usage" data-story-state="observability">
+    <div class="story-stage story-flow-stage"><div class="story-heading"><p class="story-kicker">14 / het beheersbare geheel</p><h2 class="story-title">Eén ingang. Zicht op de hele keten.</h2><p class="story-lede">De gebruiker krijgt een antwoord; het platformteam ziet gebruik, kosten en de route ernaartoe.</p></div><div class="answer-panel"><div class="answer-route"><span>request</span><i>→</i><strong data-morph-id="litellm">LiteLLM</strong><i>→</i><span>model</span><i>→</i><strong class="answer-accent">antwoord</strong></div><div class="observability-branch" data-morph-id="observability"><span class="mono">LOGS &amp; USAGE</span><strong>monitoring, kosten en gebruik</strong><small>observatie-zijstroom over de route</small></div></div><div class="closing-message"><span class="mono">DE BOODSCHAP</span><strong>LiteLLM is onze centrale AI-gateway: één ingang voor gebruikers, meerdere modelaanbieders veilig en beheersbaar ontsloten.</strong></div><div class="story-end-hint mono">← terug door de Morph-states · → volgende slide</div></div>
+    <aside class="notes"><p>De route eindigt met het antwoord terug naar OpenCode. Logs en usage lopen als zijstroom mee voor monitoring, kosten en gebruik. De kernboodschap: LiteLLM is onze centrale AI-gateway.</p></aside>
+  </section>
+
+</div>
+<link rel="stylesheet" href="platform-story.css">
+<script src="../.agents/skills/html-ppt/assets/runtime.js"></script>
+<script src="platform-story.js"></script>
+</body>
+</html>

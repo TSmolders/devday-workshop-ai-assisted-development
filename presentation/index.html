@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en" data-themes="tokyo-night,corporate-clean,nord">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Prompt to Pull Request | Enexis DevDay</title>
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/fonts.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/base.css">
+  <link rel="stylesheet" id="theme-link" href="../.agents/skills/html-ppt/assets/themes/tokyo-night.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/animations/animations.css">
+   <link rel="stylesheet" href="style.css?v=20261007-18">
+  <link rel="stylesheet" href="litellm.css?v=20261007-4">
+</head>
+<body class="tpl-workshop">
+<div class="deck">
+
+  <section class="slide cover" data-title="Cover">
+    <div class="cover-mark"><span>ENEXIS</span><span>DEV DAY / WORKSHOP</span></div>
+    <p class="kicker">AI-assisted development · 145 minutes</p>
+    <h1 class="h1">From prompt<br>to <span class="accent-text">pull request</span></h1>
+    <p class="lede">A hands-on way to use AI for development<br>with people making the decisions.</p>
+    <div class="speaker"><div class="av"></div><div><b>Tuur + Jeffrey</b><span>GenAI Usecase Team × GenAI Platform Team</span></div></div>
+    <aside class="notes">
+      <p>Welcome. This is not a talk about a prompt that writes an application for us. We will work through the steps around the prompt: <strong>what we check first, what we decide, and which checks we run before we keep a change</strong>.</p>
+      <p>Jeffrey and I are presenting together because the work crosses our teams. The platform team provides tools for any developer. We use those tools to build custom AI solutions for internal processes. You will see both sides, then use the same steps yourself.</p>
+      <p>Our fictional product is Grid Guardian, a small Glowtown dashboard for the Night of Lights festival. By the end, you will have worked through one change from an ambiguous request to a tested, reviewed result. We will pause often. Your job is to do, not just watch.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Introductions">
+    <p class="kicker">01 / who is in the room</p>
+    <h2 class="h2">Meet the people<br><span class="accent-text">running the workshop.</span></h2>
+    <div class="intro-people mt-l">
+      <div class="person-card"><img src="tuur.jpeg" alt="Tuur"><div class="person-copy"><span>AI USECASE SOLUTION ENGINEER</span><h3>Tuur</h3><p>Builds custom AI solutions for internal company processes.</p></div></div>
+       <div class="person-card"><img src="jeffrey.png" alt="Jeffrey"><div class="person-copy"><span>AI PLATFORM TEAM ENGINEER</span><h3>Jeffrey</h3><p>Builds the platform capabilities.</p></div></div>
+       <div class="person-card"><img src="images/Folkert.png" alt="Folkert"><div class="person-copy"><span>AI PLATFORM TEAM ENGINEER</span><h3>Folkert</h3><p>Builds the tools capabilities.</p></div></div>
+    </div>
+     <div class="intro-footer mt-l"><span>TUUR</span><span>+</span><span>JEFFREY</span><span>+</span><span>FOLKERT</span></div>
+    <aside class="notes">
+      <p>Before we start the content, let us introduce the two people running this workshop. I am Tuur, from the AI usecase solution engineering team. I build custom AI solutions for internal company processes.</p>
+       <p>Jeffrey is from the AI platform team. He builds the tools and platform capabilities that developers use. He will lead the platform onboarding section, then I will lead the hands-on work.</p>
+       <p>Folkert is an AI Platform Team Engineer.</p>
+      <p>We work with the same tools, but we have different products and responsibilities. That is part of the reason this workshop starts with both of us.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Agenda">
+    <p class="kicker">02 / today</p>
+    <h2 class="h2">145 minutes.<br><span class="accent-text">One development loop.</span></h2>
+    <div class="timeline mt-l">
+      <div class="time-block intro"><b>3</b><span>Intro</span><small>story + loop</small></div>
+      <div class="time-block onboard"><b>47</b><span>AI Platform Team Intro</span><small>Jeffrey</small></div>
+      <div class="time-block setup"><b>25</b><span>Setup + break</span><small>gate first, then pause</small></div>
+      <div class="time-block hands"><b>60</b><span>Hands-on</span><small>Grid Guardian</small></div>
+      <div class="time-block wrap"><b>10</b><span>Wrap-up</span><small>outcomes + questions</small></div>
+    </div>
+    <div class="action-bar mt-l"><span class="action-dot"></span><strong>Workshop format:</strong> listen during onboarding, then work hands-on with us.</div>
+    <aside class="notes">
+      <p>The planned blocks total <strong>145 minutes</strong>: three minutes for the intro, forty-seven minutes for the AI Platform Team Intro, twenty-five minutes for setup and break, sixty minutes for hands-on work, and ten minutes for wrap-up. Complete the setup gate first, then take the fifteen-minute break.</p>
+      <p>The hands-on section is sixty minutes. That is enough for one small change, not a product rewrite. We close with ten minutes to compare outcomes and name the check we would keep.</p>
+      <p>The first part is mostly listening. Jeffrey will cover the platform tools and access. The hands-on section with me is different: you will work through the issue, use the skills, and compare what you get.</p>
+      <p>If time gets tight, we remove stretch work. We keep specification, review, and guardrails because they are the parts we want you to practise.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Why together">
+    <p class="kicker">03 / who does what</p>
+    <h2 class="h2">One platform team.<br><span class="accent-text">One usecase team.</span></h2>
+    <div class="team-bridge mt-l">
+      <div class="team-card platform"><span class="team-label">AI PLATFORM TEAM</span><strong>Build tools for developers.</strong><p>Gateway, models, MCPs, harnesses, and setup support for any developer.</p></div>
+      <div class="bridge-line"><span>↔</span><small>main stakeholder</small></div>
+      <div class="team-card usecase"><span class="team-label">AI USECASE SOLUTION ENGINEERS</span><strong>Build custom AI solutions.</strong><p>Use the platform tools for internal process automation and other company usecases.</p></div>
+    </div>
+    <p class="callout mt-l"><strong>The platform team builds the tools. We use them in real internal solutions and feed back what we need.</strong></p>
+    <aside class="notes">
+      <p>Let's make the relationship between our teams explicit before we touch a tool. The <strong>AI platform team</strong> builds reusable capabilities for any developer: model access, the gateway, MCP connections, and supported ways to work.</p>
+      <p>We are <strong>AI usecase solution engineers</strong>. We are a main stakeholder for the platform team because we use those capabilities to build custom solutions for internal processes.</p>
+      <p>We have our own products and users. The platform team has its own product too. We work together by using the tools in real solutions and feeding back what works, what is missing, and what needs to change.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Promise">
+    <p class="kicker">04 / the rule for using AI</p>
+    <h2 class="h2">AI helps with tasks.<br><span class="muted">People make the decisions.</span></h2>
+    <div class="promise-grid promise-compact mt-l">
+       <div class="promise-number">01</div><div><b>AI can speed up tasks</b></div>
+       <div class="promise-number">02</div><div><b>People decide</b></div>
+       <div class="promise-number">03</div><div><b>Building trust</b></div>
+       <div class="promise-number">04</div><div><b>Use resources responsibly</b></div>
+    </div>
+    <aside class="notes">
+       <p>Here is the rule for this session: <strong>AI helps with the work; people own the problem, the decisions, and the checks</strong>. Treat every generated result as a proposal. AI can propose a change; the team decides whether it stays.</p>
+       <p><strong>01 AI can speed up tasks.</strong> Context gathering, alternatives, starter code, test ideas, and review prompts.</p>
+       <p><strong>02 People decide.</strong> Intent, boundaries, trade-offs, acceptance criteria, and output rules. The agent does not know which interpretation the business wants unless we make that visible, and it cannot decide whether an internal field is safe to expose.</p>
+       <p><strong>03 Building trust.</strong> You do not get to trust an agent by hoping. The agent has to earn it: tests and review show what changed, and automatic quality gates keep AI-generated code within the team's standards. Every time those checks catch something, or confirm something, your trust in the agent becomes grounded in evidence. The next slide shows why this matters so much.</p>
+       <p><strong>04 Use resources responsibly.</strong> Choose the model and context for the task. Keep context small and do not use the most expensive model for every request.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Trust ladder">
+    <p class="kicker">05 / autonomy is earned</p>
+    <h2 class="h2">You cannot skip<br><span class="accent-text">the climb.</span></h2>
+    <div class="ladder mt-l">
+      <div class="ladder-steps">
+        <div class="rung r1"><i>1</i><b>Chat</b><span>Ask, copy, paste.</span></div>
+        <div class="rung r2"><i>2</i><b>Single agent</b><span>One agent writes code. No loop yet.</span></div>
+        <div class="rung r3 here"><i>3</i><b>In the loop</b><span>You steer every step. Skills and guards.</span><em>YOU ARE HERE</em></div>
+        <div class="rung r4"><i>4</i><b>On the loop</b><span>You supervise. The agent runs the loop.</span></div>
+        <div class="rung r5"><i>5</i><b>Software factory</b><span>Hundreds of agents, out of the loop.</span></div>
+      </div>
+      <div class="trust-bar"><span>LESS TRUST</span><div class="tb-line"><i></i></div><span>MORE TRUST</span><strong>As trust grows, you can climb the ladder.</strong></div>
+      <div class="ladder-skip"><b>The shortcut</b><span>Jump straight to the factory</span><i>→</i><span>AI slop + token burn</span><i>→</i><span>More credits + better model</span><i>→</i><strong>Still slop</strong></div>
+    </div>
+    <aside class="notes">
+      <p>One idea carries this whole workshop: <strong>autonomy is earned, not configured</strong>. Look at the five rungs. Chat. Then a single agent writing code for you. Then in-the-loop agentic coding, where you steer every step and the agent has skills and guards. Then on-the-loop, where you supervise an agent that runs the loop itself. And at the top, a software factory with hundreds or thousands of agents building for you.</p>
+      <p>You can build towards that factory. But you cannot start there. To step back from the loop, you first have to trust your agents, and that trust is built by the agents themselves, while you watch them work in the loop. The specs, skills, guards, and retros around them are what make that visible: the guard that catches a mistake, the review that confirms the result, the retro that fixes a repeated slip. Today we walk through exactly these building blocks, as an introduction. This workshop does not move you up a rung. That happens after today, when you build your own workflows into your tools and slowly tweak your skills and agents, so your agents can earn your trust over time.</p>
+      <p>If you jump straight to the top, you get AI slop and a large token bill. The usual reaction is more credits and a better model. That is rarely the problem. It is a setup problem. A more expensive model on a missing process just produces more expensive slop.</p>
+      <p>The bar under the ladder is the key: as trust grows, you can climb. Trust is something your agents build with you, not a model you buy. Today you work at rung three. That is where your agents get the chance to earn it.</p>
+    </aside>
+  </section>
+
+  <section class="slide section-divider" data-title="Platform onboarding">
+    <div class="section-number">05</div>
+    <p class="kicker">platform section · owner: Jeffrey</p>
+    <h2 class="h1">The AI platform.<br><span class="accent-text">From gateway to practice.</span></h2>
+    <div class="insertion-note mt-l"><span>GATEWAY → CAPABILITIES → MODELS → TOKENS → ROADMAP</span><small>A practical tour of the supported platform path.</small></div>
+    <div class="section-footer"><span>47 minutes</span><span>platform tools → hands-on application</span></div>
+    <aside class="notes">
+      <p><strong>Jeffrey owns this section.</strong> We will tour how developers reach AI models, what the gateway and platform capabilities provide, and how to choose and use models responsibly.</p>
+      <p>Keep current product details, access instructions, model names, gaps, and roadmap statements accurate for the event. Do not add private URLs, credentials, internal screenshots, or configuration to this public-safe deck.</p>
+     </aside>
+   </section>
+
+  <section class="slide gateway-scope-slide" data-title="Developer experience focus">
+    <p class="gateway-scope-note">Today we're only talking about the developer experience for the gateway.</p>
+    <div class="gateway-scope-evidence">
+      <img src="images/watmagjegebruiken.png" alt="Overview of AI tools approved and not approved for use within Enexis.">
+    </div>
+  </section>
+
+  <section class="slide" data-title="AI Gateway" data-platform-flow="gateway">
+    <p class="kicker">05 / one supported path to AI</p>
+    <h2 class="h2">Meet the <span class="accent-text">AI Gateway</span>.</h2>
+    <p class="lede mt-l">A shared entry point between an application or developer tool and approved model services.</p>
+    <div class="platform-flow mt-l"><div><span>01 / CLIENT</span><b>Your application or harness</b><small>You provide the application or agent runtime.</small></div><i>→</i><div><span>02 / GATEWAY</span><b>AI Gateway</b><small>Apply access, policy, and routing.</small></div><i>→</i><div><span>03 / MODEL</span><b>Approved provider</b><small>Generate a response.</small></div><i>→</i><div><span>04 / RESULT</span><b>Back to your work</b><small>Use, check, and improve it.</small></div></div>
+    <div class="platform-callout mt-l"><strong>No Enexis-hosted agent platform — yet.</strong><span>Today, bring your own application or harness. The AI Gateway provides model access, not a hosted agent runtime.</span></div>
+    <aside class="notes"><p>Explain the gateway as the common path from a developer tool or application to model services. The gateway can provide a consistent integration and policy boundary; it is not a guarantee that every request is safe or correct.</p><p>Show the real approved setup only in the live environment-specific material. Do not put endpoints, credentials, or private configuration in this repository.</p></aside>
+  </section>
+
+     <!-- LiteLLM: Overview -->
+    <section class="slide ll-slide" data-title="LiteLLM: One entry point for AI">
+      <p class="kicker">06 / one entry point for AI</p>
+      <h2 class="h2 ll-title">One entry point for <span class="accent-text">AI</span>.</h2>
+      <div class="ll-container">
+        <div class="ll-left">
+          <div class="ll-box">
+            <div class="ll-box-title">LiteLLM</div>
+            <div class="ll-box-sub">AI Gateway</div>
+          </div>
+        </div>
+
+        <svg width="100" height="2" style="fill: none;">
+          <line x1="0" y1="1" x2="100" y2="1" stroke="var(--accent)" stroke-width="2" stroke-dasharray="8,4"/>
+        </svg>
+
+        <div class="ll-right" style="flex: 0 0 auto;">
+          <div class="ll-panel">
+            <div class="ll-panel-title">Cloud and model platforms</div>
+
+            <div class="ll-card">
+              <div class="ll-logo"><img src="images/platform-logos/azure.svg" alt="Microsoft Azure"></div>
+              <div class="ll-card-content">
+                <div class="ll-card-name">Microsoft Azure</div>
+              </div>
+            </div>
+
+            <div class="ll-card">
+              <div class="ll-logo"><img src="images/platform-logos/aws.svg" alt="AWS"></div>
+              <div class="ll-card-content">
+                <div class="ll-card-name">AWS Bedrock</div>
+              </div>
+            </div>
+
+            <div class="ll-card">
+              <div class="ll-logo"><img src="images/platform-logos/mistral.svg" alt="Mistral"></div>
+              <div class="ll-card-content">
+                <div class="ll-card-name">Mistral</div>
+              </div>
+            </div>
+
+            <div class="ll-card">
+              <div class="ll-logo ll-logo-text" aria-hidden="true">N</div>
+              <div class="ll-card-content">
+                <div class="ll-card-name">Nebius</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ll-footnote">Approved models only, exposed through one gateway</div>
+      <aside class="notes">Overview. Users and tools connect to LiteLLM. Behind it, we expose approved models from Azure, AWS Bedrock and Mistral.</aside>
+    </section>
+
+    <!-- LiteLLM: Zoom in -->
+    <section class="slide ll-slide" data-title="LiteLLM: Zoom in">
+      <p class="kicker">07 / behind the gateway</p>
+      <h2 class="h2 ll-title">Zoom in: behind the <span class="accent-text">gateway</span>.</h2>
+      <div class="ll-container">
+
+        <div class="ll-left">
+          <div class="ll-tasks">
+            <div class="ll-tasks-title">What I do as Platform Engineer</div>
+            <ul class="ll-tasks-list">
+              <li>Request and approve model access</li>
+              <li>Request and monitor quota</li>
+              <li>Configure aliases and routing</li>
+              <li>Set PII guardrails</li>
+              <li>Track usage and cost</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="ll-right">
+          <div class="ll-panel ll-model-offer-panel">
+            <div class="ll-panel-title">Models offered</div>
+            <div class="ll-offer-groups">
+              <div class="ll-offer-group">
+                  <div class="kind">Azure Foundry</div>
+                  <code>gpt-router</code>
+                  <code>gpt-5.6-luna</code>
+                  <code>gpt-6-luna</code>
+                  <code>gpt-6-sol</code>
+                  <code>gpt-6.1-sol</code>
+                </div>
+                <div class="ll-offer-group">
+                  <div class="kind">AWS Bedrock</div>
+                  <code>claude-router</code>
+                  <code>claude-haiku-4.5</code>
+                  <code>claude-sonnet-4.6-bedrock</code>
+                  <code>claude-sonnet-5-bedrock</code>
+                  <code>claude-haiku-4.5-bedrock</code>
+                  <code>claude-sonnet-5.5-bedrock</code>
+                  <code>claude-opus (only via router)</code>
+              </div>
+                <div class="ll-offer-group">
+                  <div class="kind">Mistral (EU-Only)</div>
+                  <code>mistral-zai-glm-5-3</code>
+                  <small>To be replaced by Nebius</small>
+                </div>
+                <div class="ll-offer-group">
+                  <div class="kind">Nebius (EU-Only)</div>
+                  <code>GLM-5.3</code>
+                  <code>GLM-5.3-flash</code>
+                  <code>Deepseek-4.1</code>
+                  <code>Deepseek-4.1-flash</code>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ll-footnote">Model snapshot October 2026. All approved models. Verify aliases before presenting.</div>
+      <aside class="notes">Platform Engineer responsibilities and approved models per platform. Zoom shows what we manage and what we offer.</aside>
+    </section>
+
+    <!-- LiteLLM: Capabilities -->
+  <section class="slide router-slide" data-title="Automatic model routing">
+    <p class="kicker">08 / let the gateway choose · snapshot 05 Oct 2026</p>
+    <h2 class="h2">One alias.<br><span class="accent-text">The right tier for the task.</span></h2>
+    <div class="router-process"><div><span>01 / REQUEST</span><b>Your task + context</b></div><i>→</i><div><span>02 / CLASSIFY</span><b>Keyword rule or classifier</b></div><i>→</i><div><span>03 / SELECT</span><b>Tier → model</b></div></div>
+    <table class="router-matrix"><caption>Production routing snapshot — not a guaranteed quality ranking</caption><thead><tr><th scope="col">Tier / typical task</th><th scope="col">gpt-router</th><th scope="col">claude-router</th></tr></thead><tbody><tr><th scope="row"><span class="tier-tag">SIMPLE</span><small>Short, straightforward requests</small></th><td>gpt-6-luna-medium</td><td>claude-haiku-4.5-bedrock</td></tr><tr><th scope="row"><span class="tier-tag">MEDIUM</span><small>Ordinary advice, explanation, review</small></th><td>gpt-5.6-luna-high</td><td>claude-sonnet-5.5-bedrock</td></tr><tr><th scope="row"><span class="tier-tag">COMPLEX</span><small>Implementation, debugging, refactoring</small></th><td>gpt-5.6-luna-xhigh</td><td>claude-sonnet-5.5-bedrock</td></tr><tr><th scope="row"><span class="tier-tag">REASONING</span><small>Deep analysis, security, difficult trade-offs</small></th><td>gpt-6.1-sol-high</td><td>claude-opus-5.5-bedrock*</td></tr></tbody></table>
+    <div class="router-example"><span class="mono">“Refactor this function”</span><i>→</i><strong>keyword rule: COMPLEX</strong><i>→</i><span>Luna xhigh / Sonnet 5.5</span></div>
+    <p class="platform-footnote">Classifiers: GPT-6 Luna (none) / Claude Haiku 4.5 Bedrock. *Opus is a router target, not an addition to the direct-selection list.</p>
+    <aside class="notes"><p>Verified against the live production routing policy on 05 October 2026. These are selected model aliases, not private deployment details. The gateway checks keyword rules before the model-based classifier; the highest matching keyword tier wins. Otherwise the classifier selects a tier based on the request and its context. Do not present a heuristic score as a deterministic explanation of every selection.</p><p>The policy seeks the lowest tier that can complete the task well. Ordinary advice or reviews need not use REASONING. Explicit implementation, debugging, refactoring, and test-writing rules can force COMPLEX even for a short request. Deep security audits and difficult multi-step architectural trade-offs can force REASONING.</p><p>GPT classification uses gpt-6-luna-none; Claude classification uses claude-haiku-4.5-bedrock. The configured defaults are gpt-5.6-luna-medium and claude-sonnet-5.5-bedrock. Availability fallback is a separate mechanism from complexity selection. A router does not guarantee a correct answer: check the result. The earlier gateway film contains an older model snapshot; this slide is the current reference.</p></aside>
+  </section>
+
+  <section class="slide ll-slide" data-title="LiteLLM: Capabilities">
+      <p class="kicker">08 / capabilities</p>
+      <h2 class="h2 ll-title">Platform <span class="accent-text">capabilities</span>.</h2>
+      <div class="ll-container">
+        <div class="ll-left">
+          <div class="ll-tasks">
+            <div class="ll-tasks-title">What I do as Platform Engineer</div>
+            <ul class="ll-tasks-list">
+              <li>Create autorouters</li>
+              <li>Check and maintain logs</li>
+              <li>Set the budget and help people getting the most out of it</li>
+              <li>Check Tools</li>
+              <li>Set Guardrails</li>
+              <li>Healthchecks in all forms</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ll-right">
+          <div class="ll-panel">
+            <div class="ll-panel-title">Gateway capabilities</div>
+            <div class="ll-capability-grid">
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">01</span>
+                <div><strong>Logs</strong><small>Trace requests and keep the platform observable.</small></div>
+              </div>
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">02</span>
+                <div><strong>Guardrails</strong><small>Protect requests with policy and safety controls.</small></div>
+              </div>
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">03</span>
+                <div><strong>Budget and usage</strong><small>Track consumption, cost, and agreed limits.</small></div>
+              </div>
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">04</span>
+                <div><strong>Tools</strong><small>Control which tools can be called through the platform.</small></div>
+              </div>
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">05</span>
+                <div><strong>MCP</strong><small>Use approved MCPs with pass-through OAuth 2.0.</small></div>
+              </div>
+              <div class="ll-capability-card">
+                <span class="ll-capability-index">06</span>
+                <div><strong>Skillshub</strong><small>Centralized skills we have approved for organization-wide use</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ll-footnote">Capabilities around every model request</div>
+      <aside class="notes">Zoom in on the capabilities around LiteLLM. The Platform Engineer creates autorouters, maintains observability, manages budget and usage, checks tools, sets guardrails, and keeps healthchecks working.</aside>
+    </section>
+
+   <section class="slide ll-slide capability-evidence-slide" data-title="Guardrails">
+    <p class="kicker">08 / capabilities in practice</p>
+    <h2 class="h2 ll-title">Guardrails.</h2>
+    <div class="capability-evidence-frame"><img src="images/guardails.png" alt="Guardrails Monitor screenshot"></div>
+  </section>
+
+  <section class="slide ll-slide capability-evidence-slide" data-title="Budgets">
+    <p class="kicker">08 / capabilities in practice</p>
+    <h2 class="h2 ll-title">Budgets.</h2>
+    <div class="capability-evidence-frame"><img src="images/usage.png" alt="LiteLLM usage and spend dashboard"></div>
+  </section>
+
+  <section class="slide ll-slide capability-evidence-slide" data-title="Tools">
+    <p class="kicker">08 / capabilities in practice</p>
+    <h2 class="h2 ll-title">Tools.</h2>
+    <div class="capability-evidence-frame"><img src="images/tools.png" alt="Tool Policies screenshot"></div>
+  </section>
+
+  <section class="slide ll-slide capability-evidence-slide" data-title="MCP">
+    <p class="kicker">08 / capabilities in practice</p>
+    <h2 class="h2 ll-title">MCP.</h2>
+    <div class="capability-evidence-frame"><img src="images/mcp.png" alt="MCP Servers screenshot"></div>
+  </section>
+
+  <section class="slide ll-slide capability-evidence-slide skillshub-evidence-slide" data-title="Skillshub">
+    <p class="kicker">08 / capabilities in practice</p>
+    <h2 class="h2 ll-title">Skill<span class="accent-text">shub</span>.</h2>
+    <div class="capability-evidence-frame"><img src="images/skillshub.png" alt="Enexis Skills Hub screenshot"></div>
+    <p class="skillshub-reference-url">Workshop access instructions are provided separately.</p>
+  </section>
+
+  <section class="slide gateway-film-slide" data-title="LiteLLM gateway film">
+    <p class="kicker">09 / gateway in action</p>
+    <h2 class="h2">One prompt.<br><span class="accent-text">Seven hops.</span></h2>
+    <video class="gateway-film" controls playsinline preload="metadata" poster="platform/brag-output-litellm-2026-09-29-135243/brag.jpg" src="platform/brag-output-litellm-2026-09-29-135243/brag-half-speed-silent.mp4"></video>
+    <aside class="notes"><p>This film shows one OpenCode request moving through the LiteLLM gateway. It is intentionally silent and slowed down for readability. The film is illustrative and uses public-safe examples; it is not a live operational trace.</p></aside>
+  </section>
+
+  <section class="slide token-minimisation-slide" data-title="Token minimisation">
+    <p class="kicker">10 / make every token count</p>
+    <h2 class="h2">Spend context<br><span class="accent-text">with intent.</span></h2>
+    <div class="token-tools mt-l"><div><span>COMMAND OUTPUT</span><b>RTK</b><small>Show the AI only the command output it needs.</small><code>rtk git diff · rtk pytest</code></div><div><span>RESPONSE LENGTH</span><b>Caveman</b><small>Keep the answer short. Do not remove code or requirements.</small></div><div><span>CODE CHANGES</span><b>Ponytail</b><small>Reuse what already exists. Write less new code.</small></div><div><span>CONVERSATION CONTEXT</span><b>DCP compression</b><small>Summarize finished context instead of sending it all again.</small></div></div>
+    <div class="ai-memory-tip mt-l"><span>AI MEMORY LAYER</span><strong>Keep durable context outside the prompt.</strong><small>Store stable project decisions, conventions, and lessons in a searchable memory layer. Retrieve only what the task needs.</small></div>
+    <div class="token-equation mt-l"><span>RIGHT-SIZED CONTEXT</span><i>+</i><span>SUITABLE MODEL</span><i>→</i><strong>LESS WASTE · CLEARER WORK</strong></div>
+    <p class="platform-footnote pricing-note"><strong>Long-context cost:</strong> GPT-5.6 Luna / GPT-6 Luna requests with <strong>&gt;272,000 input tokens</strong>: <strong>2× input/cache rates, 1.5× output</strong> for the whole request. Not a blanket rule for all GPT models; check current platform pricing.</p>
+     <aside class="notes"><p>The goal is not the shortest possible prompt. Keep the task, acceptance criteria, relevant code, necessary evidence, and security requirements. These four techniques reduce different kinds of context.</p><p>RTK reduces command output. Caveman reduces response length without deleting code or requirements. Ponytail reduces unnecessary code changes by reusing what already exists. DCP compression reduces conversation history by summarizing finished context. Do not compress active work or exact error details that are still needed.</p><p>OpenAI model documentation, checked 05 October 2026, confirms the threshold for GPT-5.6 Luna and GPT-6 Luna: more than 272,000 input tokens, not total input plus output. The full request uses twice the input and cache rates and 1.5 times the output rate; it is not only the overflow that costs more. This is provider list pricing, not a verified gateway billing policy. Do not assume the same rule for Sol or every GPT model. Public sources are listed in presentation/README.md.</p></aside>
+   </section>
+
+   <section class="slide preslide-budget-slide" data-title="Budget preview">
+     <img src="images/preslide-budget.png" alt="Budget preview">
+   </section>
+
+   <section class="slide budget-celebration-slide" data-title="Budget unlocked">
+    <p class="kicker">11 / a little more room</p>
+    <div class="budget-celebration-content">
+      <span class="budget-party-label">BUDGET UNLOCKED</span>
+       <h2 class="budget-celebration-title"><span>$80</span><i>→</i><strong>$100</strong></h2>
+       <p class="budget-celebration-delta">+$20 <span>/ +25%</span></p>
+      <p class="budget-celebration-caption">More room to experiment, learn, and build responsibly.</p>
+      <p class="budget-celebration-punchline">If you're gonna hit the budget, it's a skill issue.</p>
+      <div class="budget-confetti" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>
+    </div>
+     <aside class="notes"><p>The available budget increased from $80 to $100. Use the extra room to experiment deliberately: choose the right model, keep context efficient, and continue checking the result.</p></aside>
+  </section>
+
+  <section class="slide harness-support-slide" data-title="Your harness. Your responsibility.">
+    <p class="kicker">Harness support / today → future</p>
+    <h2 class="h2">Your harness.<br><span class="accent-text">Your responsibility.</span></h2>
+    <div class="platform-cards harness-cards mt-l">
+      <div><span>TODAY / YOUR CHOICE</span><b>No Enexis-provided or mandated harness.</b><small>You choose your own harness within applicable policies. Handle data, tools, and access rights responsibly.</small></div>
+      <div class="harness-future"><span>FUTURE / AI PLATFORM TEAM</span><b>Future: Enexis-code-harness</b><small>We will provide an Enexis code harness. Our ambition is to make its use mandatory; enforcement is not yet in place.</small></div>
+    </div>
+    <div class="platform-callout mt-l"><strong>No technical enforcement ≠ everything is allowed.</strong><span>Security policies and your responsibility still apply.</span></div>
+    <p class="platform-footnote">Future direction, not a currently available service. No delivery date or enforcement commitment announced here.</p>
+    <aside class="notes"><p>Presenter-confirmed direction: the AI Platform Team will offer Enexis-code-harness. The team hopes to enforce its use in the future; present mandatory use as an ambition, not an approved or implemented policy. Do not add a delivery date.</p><p>Today the team neither supplies nor mandates a harness. Developers choose their own within applicable rules. A lack of technical controls is not permission to bypass security policies, disclose sensitive data, or grant unrestricted tool access. Distinguish this code harness from the separate hosted-agent-runtime PoCs and their Q1 2027 expectation.</p></aside>
+  </section>
+
+
+  <section class="slide platform-pocs-slide" data-title="Current running PoCs">
+    <p class="kicker">AI Platform Team / exploring the next building blocks</p>
+    <h2 class="h2">Current running <span class="accent-text">PoCs.</span></h2>
+    <div class="poc-logos">
+      <figure><img src="images/poc-logos/solo.svg" alt="Solo.io logo"><figcaption>solo.io</figcaption></figure>
+      <figure><img src="images/poc-logos/agentregistry.svg" alt="agentregistry logo"><figcaption>agentregistry</figcaption></figure>
+      <figure><img src="images/poc-logos/agentgateway.svg" alt="agentgateway logo"><figcaption>agentgateway</figcaption></figure>
+      <figure><img src="images/poc-logos/kagent.svg" alt="kagent logo"><figcaption>kagent</figcaption></figure>
+      <figure><img src="images/poc-logos/coder.png" alt="Coder logo"><figcaption>coder.com</figcaption></figure>
+      <figure><img src="images/poc-logos/agentdesktop.svg" alt="agentdesktop logo"><figcaption>agentdesktop</figcaption></figure>
+      <figure><img src="images/poc-logos/enexis.png" alt="Enexis logo"><figcaption>enexis-code-harness</figcaption></figure>
+      <figure><img src="images/poc-logos/openchoreo.svg" alt="OpenChoreo logo"><figcaption>OpenChoreo</figcaption></figure>
+    </div>
+    <p class="platform-footnote">PoCs are evaluations, not production services or delivery commitments.</p>
+    <aside class="notes"><p>Presenter-provided list of current PoC technologies. No claims about results, owners or production approval. Public logo sources are recorded in presentation/README.md.</p></aside>
+  </section>
+
+<section class="slide setup-merge" data-title="Get ready">
+    <p class="kicker">12 / get ready</p>
+    <h2 class="h2">Get your key. <span class="accent-text">Run the smoke test.</span></h2>
+    <div class="setup-merge-grid mt-l">
+      <div class="reminder-card access-key-card"><span class="status pending">1 / GET YOUR KEY</span><b>Follow the workshop access instructions</b><p class="access-request-link">Request a workshop key through the channel provided by your facilitator.</p><div class="personal-key-instructions"><p>If you already have a personal key, add it as a separate provider:</p><b>In OpenCode:</b><code>/connect</code><ol><li>Choose the workshop provider.</li><li>Choose Add account.</li><li>Paste the workshop key.</li><li>Name ‘Workshop’</li><li>Remove after this session</li></ol></div></div>
+      <div class="setup-merge-right">
+        <span class="status info">2 / CHECK YOUR SETUP</span>
+        <div class="checklist">
+          <div><span>01</span><b>Key works</b></div>
+          <div><span>02</span><b>Repository is local, open in OpenCode V1</b></div>
+          <div><span>03</span><b>Restart OpenCode, Context7 is available</b></div>
+          <div><span>04</span><b>Ask before changing code</b></div>
+        </div>
+        <div class="terminal compact-terminal"><div class="terminal-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span>agent prompt</span></div><pre>Explain what the application does.
+Do not change any files.</pre><div class="proof-row"><span class="proof-icon">✓</span><strong>Check</strong><span>Access</span><span>Repository</span><span>No unintended diff</span></div></div>
+      </div>
+    </div>
+    <div class="break-band mt-l"><strong>Then: 15-minute break.</strong><span>Finish setup and the smoke test first. Stuck? Ask in the GTG channel: search “GenAI Platform Support”.</span><small class="setup-fallback">If setup does not work, team up with someone whose setup works.</small></div>
+    <aside class="notes">
+      <p>The platform section is complete. Depending on the access available on the day, request a personal developer API key or receive a temporary workshop key. Submit the relevant request now so platform engineers can handle approvals during the transition into setup.</p>
+      <p>For help, use the announced GTG channel. Share the question and safe error context, but never paste a key, private endpoint, internal issue identifier, or real operational data. The QR code and exact access route belong in live workshop material, not in this public-safe deck.</p>
+      <p>Next, explain the development loop, then complete the setup gate before the break.</p>
+      <p>Keep this slide on screen during the setup block and the break. Participants can work through the four checks without needing another slide.</p>
+       <p>First, confirm that the assigned key works. Second, clone the repository and open it in OpenCode V1. Third, restart OpenCode so the project configuration is loaded, then confirm Context7 is available. Fourth, ask the agent for a short description of the application. The prompt must not change any files.</p>
+       <p>The smoke test checks access, repository visibility, agent operation, and the absence of an unintended diff. Finish the setup and smoke test before hands-on work starts. If you are blocked, ask a platform engineer in the GTG channel.</p>
+    </aside>
+  </section>
+
+<section class="slide lifecycle-slide" data-title="Software lifecycle">
+    <p class="kicker">13 / the software lifecycle</p>
+    <h2 class="h2">A cycle, <br><span class="accent-text">not a prompt.</span></h2>
+    <div class="life-legend mt-l">
+      <div><i class="lg hands"></i><b>Hands-on today</b><span>Spec, Implement, Verify, Ship (optional)</span></div>
+      <div><i class="lg demo"></i><b>Shown, not practised</b><span>Monitor and Triage</span></div>
+      <div><i class="lg guard"></i><b>Guards</b><span>Applied at every step</span></div>
+      <div><i class="lg review"></i><b>Review</b><span>Spec, code and product</span></div>
+      <div><i class="lg retro"></i><b>Retro</b><span>Improve the cycle each time</span></div>
+    </div>
+    <svg class="life-ring" viewBox="0 0 900 900" role="img" aria-label="Software lifecycle: Triage, Spec, Implement, Verify, Ship, Monitor, with guards around the ring, review between steps and a retro at the centre">
+      <defs>
+        <path id="guardPath" d="M450,450 m-412,0 a412,412 0 1,1 824,0 a412,412 0 1,1 -824,0"/>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#BDDB00"/></marker>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#DE0073"/></marker>
+      </defs>
+      <circle class="guard-band" cx="450" cy="450" r="412"/>
+      <text class="guard-text"><textPath href="#guardPath" startOffset="0">GUARDS · TESTS · REVIEW · RUFF · PRE-COMMIT · CI · GUARDS · TESTS · REVIEW · RUFF · PRE-COMMIT · CI · GUARDS · TESTS · REVIEW · RUFF · PRE-COMMIT · CI ·</textPath></text>
+      <circle class="ring-track" cx="450" cy="450" r="300"/>
+      <!-- chevrons on plain arcs, rotated to the clockwise tangent -->
+      <path class="chev" d="M-9,-13 L9,0 L-9,13" transform="translate(450,150) rotate(0)"/>
+      <path class="chev" d="M-9,-13 L9,0 L-9,13" transform="translate(710,300) rotate(60)"/>
+      <path class="chev" d="M-9,-13 L9,0 L-9,13" transform="translate(190,300) rotate(300)"/>
+      <!-- review badges -->
+      <g class="review-badge" transform="translate(710,600)"><rect x="-74" y="-20" width="148" height="40" rx="20"/><text y="6">REVIEW SPEC</text></g>
+      <g class="review-badge" transform="translate(450,750)"><rect x="-62" y="-20" width="124" height="40" rx="20"/><text y="6">REVIEW CODE</text></g>
+      <g class="review-badge" transform="translate(190,600)"><rect x="-84" y="-20" width="168" height="40" rx="20"/><text y="6">REVIEW PRODUCT</text></g>
+      <!-- entry -->
+      <g class="entry" transform="translate(450,104)"><rect x="-150" y="-27" width="300" height="54" rx="12"/><text y="5">NEW IDEA OR BUG REPORTED</text></g>
+      <path class="entry-arrow" d="M600,104 C625,104 630,125 630,150" marker-end="url(#arr)"/>
+      <!-- nodes -->
+      <g class="ring-node demo" transform="translate(600,190)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Triage</text></g>
+      <g class="ring-node hands" transform="translate(750,450)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Spec</text></g>
+      <g class="ring-node hands" transform="translate(600,710)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Implement</text></g>
+      <g class="ring-node hands" transform="translate(300,710)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Verify</text></g>
+      <g class="ring-node hands" transform="translate(150,450)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Ship</text></g>
+      <g class="ring-node demo" transform="translate(300,190)"><rect x="-80" y="-34" width="160" height="68" rx="34"/><text y="9">Monitor</text></g>
+      <text class="demo-tag" x="300" y="242">DEMO ONLY</text>
+      <text class="demo-tag" x="600" y="242">DEMO ONLY</text>
+      <!-- retro -->
+      <circle class="retro-orbit" cx="450" cy="450" r="150" marker-end="url(#arr2)"/>
+      <g class="retro"><circle cx="450" cy="450" r="108"/><text x="450" y="446">RETRO</text><text class="retro-sub" x="450" y="476">better each cycle</text></g>
+    </svg>
+    <aside class="notes">
+      <p>Software development is a cycle, not a prompt. A new idea or a bug report enters at the top. It gets <strong>triaged</strong>, <strong>specified</strong>, <strong>implemented</strong>, <strong>verified</strong>, <strong>shipped</strong> and <strong>monitored</strong>. What we learn from monitoring feeds the next idea or bug.</p>
+      <p>Review is not one step at the end. It happens at several points: we review the <strong>spec</strong> before we build, the <strong>code</strong> before we verify, and the <strong>product</strong> before we ship.</p>
+      <p>The outer band is <strong>guards</strong>: tests, Ruff, pre-commit, CI and the other automatic checks. They apply at every step, not just in a verify step at the end.</p>
+      <p>In the centre is the <strong>retro</strong>. After a cycle we look at what happened and improve the environment: a skill, an instruction, a guard. The cycle should be a bit better every time.</p>
+      <p>AI can help with all of this. Today you practise the highlighted steps: spec, implement and verify, with guards and review across them and a retro to finish. Triage and monitor are dimmed: we show how agents can do them, but there is no hands-on. Ship is optional hands-on if you have the GitHub CLI available.</p>
+    </aside>
+  </section>
+
+    <section class="slide" data-title="Grid Guardian">
+    <p class="kicker">14 / the mock use case</p>
+    <h2 class="h2">Meet <span class="accent-text">Grid Guardian</span>.</h2>
+    <div class="story-brief-grid mt-l"><div><span>THE PRODUCT</span><b>Neighborhood status dashboard for the Night of Lights.</b></div><div><span>THE REQUEST</span><b>Add a briefing for one selected neighborhood.</b></div><div><span>THE LIMIT</span><b>Show status and one active incident. Do not show fixture or internal metadata.</b></div></div>
+    <div class="run-cmd mt-l"><span>RUN THE APP</span><code>uv run streamlit run src/devday_workshop_ai_assisted_development/app.py</code></div>
+    <div class="safe-note mt-l"><span>FICTIONAL INPUT ONLY</span><strong>Use fixtures, not operational data.</strong><small>Check that the briefing does not return fixture metadata.</small></div>
+    <aside class="notes">
+      <p>Our hands-on product is <strong>Grid Guardian</strong>, a fictional Glowtown dashboard for the Night of Lights festival. The dashboard already shows a neighborhood's current status. The request is to add a quick power briefing for a selected neighborhood: its status and the one active incident that needs attention most.</p>
+      <p>The story is small, but it has real decisions in it. The repository contains active and resolved incidents, severity, event time, and fixture fields that should not appear in a human-facing briefing. We can work through those decisions without using real operational data.</p>
+      <p>To see the app, run the command on the slide from the repository root. It starts the Streamlit dashboard in your browser. You can leave it running while you work, and restart it after the agent changes the code.</p>
+      <p>We will use the local Markdown issue as the canonical source. If Atlassian MCP access is available, we can show reading the same kind of story as an integration pattern, but nobody should be blocked by a shared Jira board.</p>
+    </aside>
+  </section>
+
+  <section class="slide credits-slide" data-title="Credits">
+    <p class="kicker">15 / standing on shoulders</p>
+    <h2 class="h2">Built on ideas<br><span class="accent-text">from the community.</span></h2>
+    <div class="credits-grid mt-l">
+      <a class="credit-card main" href="https://github.com/mattpocock/skills"><span>THE BASELINE FOR OUR SKILLS</span><b>Matt Pocock</b><em>github.com/mattpocock/skills</em><small>Triage, spec, grilling, TDD, review: most of the workflow skills you use today start here.</small></a>
+      <a class="credit-card" href="https://github.com/poteto"><span>AGENT SKILLS AND RETROS</span><b>Lauren Tan</b><em>github.com/poteto</em><small>Skills, memory and orchestration ideas that shaped how we think about improving the agent.</small></a>
+    </div>
+    <div class="agnostic mt-l"><span>TOOL-AGNOSTIC</span><strong>The tools are examples. The lifecycle is the lesson.</strong><i>Keep to the software lifecycle principles and any tool will do.</i></div>
+    <aside class="notes">
+      <p>Before we start the hands-on, a shout-out. The skills you will use today are built on ideas from the community. <strong>Matt Pocock</strong> is the main baseline: his skills repository is where most of our workflow skills started, and we adapted them for this workshop. <strong>Lauren Tan</strong> has also published interesting work on agent skills and orchestration. Both repositories are on GitHub, and they are worth following after today.</p>
+      <p>Important: what you learn today is <strong>tool-agnostic</strong>. We use specific skills and a specific harness because we need something concrete. But the lesson is the lifecycle: triage, spec, implement, verify, ship, retro, with guards and review along the way. As long as you keep to those principles, you can use any tool, and you can swap tools when a better one comes out.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Triage">
+    <p class="kicker">16 / step one: triage</p>
+    <h2 class="h2"><span class="step-accent">01</span> Triage before code.</h2>
+    <div class="tri-flow mt-l">
+      <div class="tri-card"><span>01 / IN</span><b>A raw issue</b><div class="issue-file mono">Add a Grid Guardian briefing</div></div>
+      <div class="auto-arrow">→</div>
+      <div class="tri-card skill"><span>02 / TRIAGE</span><b>Is it ready?</b><ul><li>Read the context</li><li>Verify the claim</li><li>Ask if something is unclear</li></ul></div>
+      <div class="auto-arrow">→</div>
+      <div class="tri-card"><span>03 / OUT</span><b>A decision</b><div class="chips"><em class="chip">Bug</em><em class="chip on">Enhancement</em></div><div class="chips"><em class="chip">Ready for implementation</em><em class="chip on">Needs a spec</em><em class="chip">Needs human input</em><em class="chip">Won't fix</em></div></div>
+    </div>
+    <div class="safe-note mt-l"><span>DEMO ONLY</span><strong>Today you start hands-on at Spec, as triage is less necessary when you are in the loop.</strong></div>
+    <aside class="notes">
+      <p>We start with the local issue. It is <strong>ready for triage but not ready for implementation</strong>. That distinction is the first important judgment call. The request sounds clear enough to code, but it leaves behavior open.</p>
+      <p>Triage takes a raw issue in and puts a decision out. Is it ready for implementation? Does it need a spec first? Does it need human input? Is it a bug or an enhancement, or something we will not fix? Behind the scenes we use a triage skill that reads the context, verifies the claim and asks when information is missing, but the idea matters more than the tool.</p>
+      <p>This issue is an <strong>enhancement that needs a spec</strong>. The facilitator can show a triage live. There is no exercise: when you are in the loop yourself, triage is less necessary, because you already decide what to work on. You start hands-on at the specification.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Monitor to triage">
+    <p class="kicker">17 / automate the front door</p>
+    <h2 class="h2">Triage can start<br><span class="accent-text">before anyone looks.</span></h2>
+    <div class="auto-flow mt-l">
+      <div class="auto-step"><span>01 / MONITOR</span><b>Datadog alert fires</b></div><div class="auto-arrow">→</div>
+      <div class="auto-step"><span>02 / TRIGGER</span><b>Webhook starts an agent</b></div><div class="auto-arrow">→</div>
+      <div class="auto-step agent"><span>03 / TRIAGE AGENT</span><b>Same /triage skill</b></div><div class="auto-arrow">→</div>
+      <div class="auto-step"><span>04 / ISSUE</span><b>Ticket with a decision</b></div><div class="auto-arrow">→</div>
+      <div class="auto-step human"><span>05 / PEOPLE</span><b>A person confirms</b></div>
+    </div>
+    <div class="later-path mt-l"><span>LATER, WITH TRUST</span><em>Triage says ready-for-agent</em><i>→</i><em>Implementation starts by itself</em><small>no person in between</small></div>
+    <div class="safe-note mt-l"><span>DEMO ONLY</span><strong>The skill you run by hand today is the one you can trigger automatically later.</strong></div>
+    <aside class="notes">
+      <p>Monitor is the step at the top-left of the lifecycle. We do not practise it today, but it connects directly to triage.</p>
+      <p>Imagine a Datadog monitor fires. A webhook sends the alert payload to a triage agent. That agent runs the same triage skill you just used by hand: it gathers logs and code context, verifies that the alert is real, and recommends a category and state. The result is an issue in the tracker, labelled needs-info, ready-for-agent or ready-for-human.</p>
+      <p>Today a person still confirms the state before anything is implemented. But look at the dashed path: once you trust what the triage skill decides, a ready-for-agent outcome could start an implementation agent directly, with nobody in between. That is for later, after you have built that trust. The skill you run by hand today is the one you can trigger automatically tomorrow. That is the trust ladder again.</p>
+      <p>Show a short demo or a sketch of the setup here if time allows. The exact alert source and wiring are not part of the exercise.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Specify">
+    <p class="kicker">18 / step two: specify</p>
+    <h2 class="h2"><span class="step-accent">02</span> Specify before<br><span class="accent-text">you implement.</span></h2>
+    <div class="grill-flow mt-l"><div class="grill-step"><span>01 / FRONTIER</span><b>Ask the open questions.</b><small>Ask the whole current frontier: decisions whose prerequisites are already settled.</small></div><div class="grill-step"><span>02 / RECOMMEND</span><b>Offer a recommended answer.</b><small>Make the trade-off visible instead of hiding it in generated prose.</small></div><div class="grill-step"><span>03 / NEXT ROUND</span><b>Wait, then recompute.</b><small>Use the answers to find the next questions. Stop when every branch is settled.</small></div></div>
+    <div class="context-strip mt-l"><span class="mono">ISSUE</span><span>+</span><span class="mono">REPOSITORY</span><span>+</span><span class="mono">GRILLING</span><span>→</span><strong>settled specification</strong></div>
+    <aside class="notes">
+      <p>Now we write the specification. The <strong>grilling</strong> skill treats this as a design-tree interview, not a one-shot list of questions.</p>
+      <p>It asks the whole current frontier, gives recommended answers, waits for our answers, and recomputes the frontier. A decision can expose more decisions. The interview stops only when all branches are settled.</p>
+      <p>The slide shows the process, not the answers for Grid Guardian. We still need to make those domain decisions and turn them into acceptance criteria, examples, and out-of-scope notes.</p>
+       <p>Next slide is the <strong>grilling workflow</strong> comparison.</p>
+    </aside>
+  </section>
+
+<section class="slide" data-title="Grilling workflows">
+      <p class="kicker">19 / choose the grilling workflow</p>
+      <h2 class="h2">Same interview.<br><span class="accent-text">Different memory.</span></h2>
+      <div class="grill-compare mt-l"><div class="grill-compare-card"><span>GRILL-ME · STATELESS</span><b>Interview that lives in the chat</b><small>Asks questions in rounds and waits for your answers. Nothing is written to the project. When the session ends, the decisions end with it, unless you write them down.</small><div class="grill-compare-flow mono">QUESTION → ANSWER → NEXT FRONTIER</div></div><div class="grill-compare-card docs"><span>GRILL-WITH-DOCS · STATEFUL</span><b>Interview that updates the project</b><small>Combines grilling with domain-modeling. It records settled decisions in ADRs and glossary entries as the design changes, so the next session starts from them.</small><div class="grill-compare-flow mono">QUESTION → ANSWER → ADR / GLOSSARY</div></div></div>
+      <div class="grill-compare-note mt-l"><strong>Grilling is the shared process.</strong><span>Choose the docs workflow when decisions need to outlive the session.</span></div>
+      <aside class="notes">
+        <p>Both options use the same grilling process. The interview asks the current frontier, offers recommended answers, waits for our answers, and recomputes the next questions.</p>
+        <p><strong>/grill-me</strong> is <strong>stateless</strong>. The conversation is the only place the decisions live. Use it when you need to settle a decision in the current session and do not need to update project documents.</p>
+        <p><strong>/grill-with-docs</strong> is <strong>stateful</strong>. It combines grilling with domain-modeling and records settled decisions in project documents such as ADRs and glossary entries. A later session, or another person, starts from those documents instead of from nothing.</p>
+         <p>Next slide is the <strong>Pause + Do</strong> for spec.</p>
+     </aside>
+   </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Spec">
+     <p class="kicker">pause + do / spec</p>
+     <div class="pd-grid">
+       <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Shape the spec.<br><span class="accent-text">Inspect the output.</span></h2><p class="pd-goal">Turn the Grid Guardian issue into a settled specification and tickets.</p></div>
+       <ol class="pd-steps"><li><b>01</b><span>Run <span class="mono">/grill-with-docs</span> on the issue.</span></li><li><b>02</b><span>Answer every question. Accept or change each recommendation.</span></li><li><b>03</b><span>Ask <span class="mono">/to-spec</span> and <span class="mono">/to-tickets</span> to write the spec and tickets.</span></li><li><b>04</b><span>Inspect the generated spec and ticket Markdown documents.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>The generated spec and tickets are clear enough for an agent to implement.</strong></div>
+     <aside class="notes"><p>This is your first hands-on block. Participants run the docs workflow, answer its questions, and inspect what it produces. They do not write the acceptance criteria by hand: the agent turns the settled decisions into the spec and tickets.</p><p>Ask them to accept or change every recommendation rather than blindly approving the interview. Before moving on, they should open the generated Markdown files and check that the decisions, boundaries, and ticket scope are actually there.</p></aside>
+  </section>
+
+   <section class="slide" data-title="Session management">
+      <p class="kicker">20 / keep the session focused</p>
+     <h2 class="h2">Finish the spec.<br><span class="accent-text">Then hand off.</span></h2>
+     <div class="handoff-flow mt-l"><div class="handoff-step"><span>01 / CURRENT SESSION</span><b>Settle the ticket.</b><small>Finish the specification, acceptance criteria, examples, and out-of-scope notes.</small></div><div class="handoff-arrow">→</div><div class="handoff-step"><span>02 / /handoff</span><b>Write what the next session needs.</b><small>Capture the goal, decisions, files, checks, and the next action in a handoff document.</small></div><div class="handoff-arrow">→</div><div class="handoff-step"><span>03 / NEW SESSION</span><b>Implement one ticket.</b><small>Start clean. Use the handoff as context, then implement and test one ticket at a time.</small></div></div>
+     <div class="handoff-note mt-l"><span class="mono">/handoff</span><strong>One implementation session per ticket keeps context small.</strong></div>
+     <aside class="notes">
+       <p>After specification, I usually start a new session before implementation. The current session has done its job: it has resolved the questions, written the acceptance criteria, and recorded the boundaries.</p>
+       <p>I use the <strong>/handoff</strong> skill to write the context the next session needs. That handoff includes the ticket, the decisions we made, the relevant files, the checks to run, and the next action. It should not copy every conversation detail. It should make the next session startable.</p>
+       <p>Then I start a fresh session and implement one ticket. If there are several tickets, I normally use one implementation session per ticket. This keeps the context focused and makes it easier to see what belongs to each change.</p>
+        <p>Next slide is the <strong>Pause + Do</strong> for handoff.</p>
+     </aside>
+   </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Handoff">
+     <p class="kicker">pause + do / handoff</p>
+     <div class="pd-grid">
+       <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Move the work<br><span class="accent-text">to a new session.</span></h2><p class="pd-goal">Carry the settled spec and tickets into implementation without carrying the whole chat.</p></div>
+       <ol class="pd-steps"><li><b>01</b><span>Run <span class="mono">/handoff</span>. Tell the agent the new session will implement the spec and tickets with <span class="mono">/devday-implement</span> and <span class="mono">/code-review</span>.</span></li><li><b>02</b><span>Read the handoff document before starting the new session.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>The next session has enough context to start implementation without reopening the whole interview.</strong></div>
+     <aside class="notes"><p>This is the context boundary. Participants ask the agent to create the handoff, then inspect it before opening a new session. The handoff should point to the spec and tickets and name the implementation and review skills we will use next.</p></aside>
+  </section>
+
+
+  <section class="slide" data-title="Implementation">
+      <p class="kicker">21 / step three: implement</p>
+    <h2 class="h2"><span class="step-accent">03</span> Implement one<br><span class="accent-text">small tested change.</span></h2>
+     <div class="tdd-flow mt-l"><div class="tdd-step red-step"><span>01</span><b>RED</b><small>Write the behavior test first.</small></div><div class="flow-arrow">→</div><div class="tdd-step amber-step"><span>02</span><b>GREEN</b><small>Implement only enough to pass.</small></div></div>
+    <div class="code-prompt mt-l"><span class="mono">/devday-implement</span><span>+ </span><span class="mono">/tdd</span><strong>Keep the Streamlit layer thin.</strong></div>
+    <aside class="notes">
+      <p>Only now do we implement. The target is <strong>one small tested change</strong>, not a redesign of Grid Guardian. The existing dashboard behavior stays intact. We add a testable domain seam for the briefing and keep the Streamlit layer focused on collecting a neighborhood and rendering the result.</p>
+       <p>Use the workshop implementation skill together with TDD. Start with a failing test that expresses one acceptance criterion. Then implement only enough behavior to make it pass. Refactoring is part of the review stage, not the red-to-green implementation loop.</p>
+      <p>Watch for these shortcuts: selecting the first incident in fixture order, treating resolved incidents as current, returning internal metadata, or putting business rules in the UI. They can pass a happy-path demo. Tests should cover the decisions we made.</p>
+      <p>Next slide is the <strong>Pause + Do</strong> for this step.</p>
+    </aside>
+  </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Implement">
+    <p class="kicker">pause + do / implement</p>
+    <div class="pd-grid">
+      <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Implement the spec.<br><span class="accent-text">Inspect the change.</span></h2><p class="pd-goal">Let the agent implement the small story, including its tests.</p></div>
+      <ol class="pd-steps"><li><b>01</b><span>Give the new session the handoff, spec, and tickets.</span></li><li><b>02</b><span>Ask <span class="mono">/devday-implement</span> to implement the full spec.</span></li><li><b>03</b><span>Let the agent write and run the tests as part of the implementation.</span></li><li><b>04</b><span>Inspect the diff, test results, and behavior. Instruct the agent when something needs changing.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>The small spec is implemented, its tests are green, and you understand the result.</strong></div>
+     <aside class="notes"><p>The participant does not write the tests. They give the agent the handoff and ask it to implement the complete, deliberately small story. The agent writes and runs the tests.</p><p>The participant's job is to inspect the diff, test output, and behavior, then steer the agent if the implementation drifts beyond the spec.</p></aside>
+  </section>
+
+
+  <section class="slide" data-title="Review">
+      <p class="kicker">22 / step four: review and verify</p>
+    <h2 class="h2"><span class="step-accent">04</span> "Tests pass"<br><span class="muted">is not the review.</span></h2>
+    <div class="review-matrix review-four mt-l"><div class="lens behavior"><b>STANDARDS</b><span>Does the change follow the repository standards?</span></div><div class="lens tests"><b>SPEC</b><span>Does it implement the issue and acceptance criteria?</span></div><div class="lens security"><b>SECURITY</b><span>Does the output exclude fixture and internal metadata?</span></div><div class="lens user"><b>USER REVIEW</b><span>Can a real user understand the known, unknown, and no-active states?</span></div></div>
+    <div class="review-tools mt-l"><span>/code-review</span><span>Standards</span><span>Spec</span><span>/user-review</span></div>
+    <aside class="notes">
+      <p>Implementation stops before this slide. The facilitator runs the review separately instead of asking the implementer to approve their own change.</p>
+      <p>Use <strong>code-review</strong> for its two axes: Standards and Spec. Standards checks the repository's coding rules. Spec checks the originating issue and acceptance criteria.</p>
+      <p>Then run <strong>user-review</strong> against the Streamlit app as a real user. Exercise a known neighborhood, an unknown neighborhood, and a neighborhood with no active incident. Check that the output makes sense to an event coordinator and does not show fixture or internal metadata.</p>
+      <p>Next slide is the <strong>Pause + Do</strong> for this step.</p>
+    </aside>
+  </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Review">
+    <p class="kicker">pause + do / review and verify</p>
+    <div class="pd-grid">
+      <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Review what<br><span class="accent-text">the agent built.</span></h2><p class="pd-goal">Let the agent review and fix the change. You inspect the result.</p></div>
+      <ol class="pd-steps"><li><b>01</b><span>Ask the agent to run <span class="mono">/code-review</span> for Standards and Spec.</span></li><li><b>02</b><span>Ask it to run <span class="mono">/user-review</span> against the app and exercise the key scenarios.</span></li><li><b>03</b><span>Instruct the agent to fix the findings it can address, then rerun the review.</span></li><li><b>04</b><span>Inspect the changed diff, review output, and user-facing behavior.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>Review findings are addressed or consciously left open, and you have inspected the outcome.</strong></div>
+     <aside class="notes"><p>The participant does not need to create a review report or fix the code themselves. They ask the agent to run the code and user reviews, then tell it to address the findings it can address.</p><p>Keep the wording conservative: the agent may need direction, and not every finding can be fixed automatically. The participant inspects the final diff, review output, and running behavior before trusting the result.</p></aside>
+  </section>
+
+
+<section class="slide" data-title="Guard">
+      <p class="kicker">23 / guards, at every step</p>
+    <h2 class="h2">Guards run at<br><span class="accent-text">every step.</span></h2>
+    <div class="guard-matrix mt-l"><div class="gm-row gm-head"><span></span><span class="d">TRIAGE</span><span class="">SPEC</span><span class="">IMPLEMENT</span><span class="">VERIFY</span><span>SHIP</span><span class="v">WHAT IT VERIFIES</span></div><div class="gm-row"><b>ACCEPTANCE CRITERIA</b><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><span class="v">The ask is explicit and checkable</span></div><div class="gm-row"><b>TESTS</b><i class=""></i><i class=""></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="v">The agreed behavior still holds</span></div><div class="gm-row"><b>RUFF</b><i class=""></i><i class=""></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="v">Code quality and style</span></div><div class="gm-row"><b>PRE-COMMIT</b><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><span class="v">Local checks, before code leaves your machine</span></div><div class="gm-row"><b>REVIEW</b><i class=""></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><span class="v">Standards, spec and product</span></div><div class="gm-row"><b>CI</b><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><span class="v">Everything again, for everyone</span></div></div>
+    <aside class="notes">
+      <p>Guards are not a final step. They apply along the whole lifecycle: the outer band on the lifecycle slide. Read the matrix as a map: the rows are the guards, the columns are the lifecycle steps, and a dot means the guard runs there.</p>
+       <p>At triage and spec the guard is <strong>acceptance criteria</strong>: an explicit category and state, and criteria a test can check. <strong>Tests</strong> protect the agreed behavior. <strong>Ruff</strong> checks code quality. <strong>Pre-commit</strong> runs local checks before a change leaves your machine. <strong>Review</strong> checks the spec before we build and the code while we implement and verify. A team can add CI later to repeat these checks for every change.</p>
+       <p>Ask the agent to run the local tests, Ruff, and the repository's pre-commit or other documented checks. The exact commands are discoverable from the README and project setup. These checks should run without proprietary infrastructure, so the exercise remains portable.</p>
+      <p>Every time a guard catches something, or passes, you build evidence for how far you can trust the agent. That is how you climb the ladder.</p>
+      <p>Next slide is the <strong>Pause + Do</strong> for this step.</p>
+    </aside>
+  </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Guards">
+    <p class="kicker">pause + do / guards</p>
+    <div class="pd-grid">
+      <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Ask the agent<br><span class="accent-text">to run the guards.</span></h2><p class="pd-goal">Inspect the local checks that protect the repository.</p></div>
+      <ol class="pd-steps"><li><b>01</b><span>Ask the agent to run the repository's local tests.</span></li><li><b>02</b><span>Ask it to run Ruff and the configured pre-commit or repository checks.</span></li><li><b>03</b><span>Inspect the output and instruct the agent to fix failures, then rerun the checks.</span></li><li><b>04</b><span>Keep the result in your local clone. Commit to your own fork if you want to keep it.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>The local guards are green, and you have inspected the results and any fixes.</strong></div>
+     <aside class="notes"><p>The participant instructs the agent to run the checks; they do not need to run them manually. The public repository has no workshop CI pipeline, so keep this local: tests, Ruff, and any pre-commit or repository-provided checks.</p><p>If something fails, that is the guard doing its job. Ask the agent to fix it and run the checks again. Participants are working from local clones and may commit to their own fork; nothing is merged into the workshop repository.</p></aside>
+  </section>
+
+
+  <section class="slide" data-title="Rails">
+    <p class="kicker">24 / why spec and guards matter</p>
+    <h2 class="h2">Spec and guards<br><span class="accent-text">keep the agent on the rails.</span></h2>
+    <svg class="rails-svg" viewBox="0 0 1740 440" role="img" aria-label="Top: the agent runs on tracks made of spec and guards. Bottom: without them the track ends and the agent derails into AI slop.">
+      <defs><marker id="rarr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#BDDB00"/></marker></defs>
+      <text x="0" y="22" class="rl ok">WITH A SPEC AND GUARDS</text>
+      <rect x="0" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="44" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="88" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="132" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="176" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="220" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="264" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="308" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="352" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="396" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="440" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="484" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="528" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="572" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="616" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="660" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="704" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="748" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="792" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="836" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="880" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="924" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="968" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1012" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1056" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1100" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1144" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1188" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1232" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1276" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1320" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1364" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1408" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1452" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1496" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1540" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1584" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1628" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1672" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="1716" y="48" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/>
+      <rect x="0" y="58" width="1740" height="9" fill="#ffbe78"/><rect x="0" y="114" width="1740" height="9" fill="#d3a8ff"/>
+      <rect x="1500" y="49" width="130" height="28" rx="14" fill="#0e1524" stroke="#ffbe78" stroke-width="2"/><text x="1565" y="69" class="rt" style="font-size:16px;fill:#ffbe78">GUARDS</text><rect x="1500" y="105" width="130" height="28" rx="14" fill="#0e1524" stroke="#d3a8ff" stroke-width="2"/><text x="1565" y="125" class="rt" style="font-size:16px;fill:#d3a8ff">SPEC</text>
+      <rect x="500" y="62" width="120" height="56" rx="10" fill="#1b2438" stroke="#BDDB00" stroke-width="2"/><text x="560" y="97" class="rt">CODE</text>
+      <rect x="640" y="62" width="120" height="56" rx="10" fill="#1b2438" stroke="#BDDB00" stroke-width="2"/><text x="700" y="97" class="rt">TESTS</text>
+      <rect x="780" y="56" width="230" height="68" rx="14" fill="#BDDB00"/><text x="895" y="98" class="rt eng">AGENT</text>
+      <path d="M1050,90 L1150,90" stroke="#BDDB00" stroke-width="5" marker-end="url(#rarr)"/><text x="1175" y="99" class="rl ok">ON TRACK</text>
+      <g transform="translate(0,-30)"><text x="0" y="232" class="rl bad">WITHOUT THEM</text>
+      <rect x="0" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="44" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="88" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="132" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="176" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="220" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="264" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="308" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="352" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="396" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="440" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="484" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="528" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="572" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="616" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="660" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="704" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/><rect x="748" y="256" width="14" height="86" rx="3" fill="#1b2438" stroke="#2c3a55"/>
+      <rect x="0" y="266" width="760" height="9" fill="#ffbe78"/><rect x="0" y="322" width="760" height="9" fill="#d3a8ff"/>
+      <rect x="320" y="270" width="100" height="52" rx="10" fill="#2a1a22" stroke="#ff7b72" stroke-width="2"/><text x="370" y="303" class="rt bad">CODE</text>
+      <rect x="440" y="264" width="220" height="64" rx="14" fill="#ff7b72"/><text x="550" y="304" class="rt eng">AGENT</text>
+      <g transform="translate(900,390) rotate(28)"><rect x="-110" y="-32" width="220" height="64" rx="14" fill="#ff7b72"/><text x="0" y="9" class="rt eng">AGENT</text></g>
+      <g transform="translate(1110,418) rotate(-14)"><rect x="-50" y="-26" width="100" height="52" rx="10" fill="#2a1a22" stroke="#ff7b72" stroke-width="2"/><text x="0" y="7" class="rt bad">CODE</text></g>
+      <path d="M690,300 C780,290 820,330 850,350" fill="none" stroke="#ff7b72" stroke-width="4" stroke-dasharray="8 8"/>
+      <text x="1240" y="400" class="rl bad">AI SLOP</text>
+    </g>
+    </svg>
+    <div class="rails-legend mt-l">
+      <div class="rl-card rail2"><span>RAIL ONE</span><b>Spec</b><i>Acceptance criteria say where the track goes.</i></div>
+      <div class="rl-card rail1"><span>RAIL TWO</span><b>Guards</b><i>Tests, Ruff, pre-commit, CI keep it there.</i></div>
+    </div>
+    <aside class="notes">
+      <p>If you remember one thing from the hands-on, make it this picture. The agent is a fast train. Speed is not the problem. Direction is.</p>
+      <p>Two rails keep it on track. The <strong>spec</strong> is one rail: it fixes where the track goes, with acceptance criteria and out-of-scope notes. The <strong>guards</strong> are the other rail: tests, Ruff, pre-commit and CI catch mistakes automatically.</p>
+      <p>Without them the train still moves, probably faster, but it ends up off the tracks. That is AI slop. Spending time on the spec and the guards is what makes the agent trustworthy enough to run unattended later.</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Ship">
+    <p class="kicker">25 / shipping, optional hands-on</p>
+    <h2 class="h2">Agents can prepare<br><span class="accent-text">the pull request.</span></h2>
+    <div class="ship-grid mt-l">
+      <div class="ship-card try"><span>01 / OPEN · TRY IT</span><b>Write and open the PR</b><small>The <span class="mono">/pr</span> skill writes the PR body from the diff and the spec. The <span class="mono">gh</span> CLI opens it.</small></div>
+      <div class="ship-card"><span>02 / FIX</span><b>Fix failing CI</b><small>The agent reads the failing logs, fixes the cause, and pushes again.</small></div>
+      <div class="ship-card"><span>03 / RESPOND</span><b>Handle review comments</b><small>The agent proposes fixes for the team's comments.</small></div>
+      <div class="ship-card human"><span>04 / PEOPLE</span><b>People approve and merge</b><small>Review, approval and merge stay with the team.</small></div>
+    </div>
+    <aside class="notes">
+      <p>Shipping is the left-hand side of the lifecycle. If you have the GitHub CLI available, you can try the first card yourself. Otherwise just follow along.</p>
+      <p>An agent can prepare the pull request. The <strong>/pr</strong> skill writes the PR body from the diff and spec, and the <strong>gh</strong> CLI opens it. Use a throwaway or mock repository. If CI fails, the agent can read the logs, fix the cause and push. If teammates leave review comments, the agent can read them, propose fixes and push, and the reviewer checks again. We only show those two.</p>
+      <p>Approval and merge stay with people. This is the last step to hand over, and only once the earlier guards have earned that trust.</p>
+    </aside>
+  </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Ship">
+    <p class="kicker">pause + do / ship</p>
+    <div class="pd-grid">
+      <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><span class="pd-opt">OPTIONAL</span><h2 class="h2">Open a<br><span class="accent-text">mock pull request.</span></h2><p class="pd-goal">Let the agent prepare the PR. Only if you have the GitHub CLI.</p></div>
+       <ol class="pd-steps"><li><b>01</b><span>Tell the agent: “Create a PR with the <span class="mono">gh</span> CLI and the <span class="mono">/pr</span> skill.”</span></li><li><b>02</b><span>Inspect the PR body the agent created.</span></li></ol>
+     </div>
+     <div class="pd-done"><span>DONE WHEN</span><strong>The PR exists and you have inspected the body for accuracy.</strong></div>
+     <aside class="notes"><p>This one is optional. If the GitHub CLI is configured, give the agent the exact instruction on the slide, then inspect the PR body it creates. If not, follow along with the demonstration.</p></aside>
+  </section>
+
+
+  <section class="slide" data-title="Retro">
+    <p class="kicker">26 / retro</p>
+    <h2 class="h2">Every cycle makes<br><span class="accent-text">the next one better.</span></h2>
+    <div class="handoff-flow mt-l"><div class="handoff-step"><span>01 / /retro</span><b>Look back at your session.</b><small>The retro skill reads the session and suggests how to improve the agent's environment for future runs.</small></div><div class="handoff-arrow">→</div><div class="handoff-step"><span>02 / PICK ONE</span><b>Choose one improvement.</b><small>The one that would have saved you the most time or caught a mistake earlier.</small></div><div class="handoff-arrow">→</div><div class="handoff-step"><span>03 / WRITE IT DOWN</span><b>Make the tweak.</b><small>An AGENTS.md rule, a skill tweak, or a new guard. Not a lesson that lives in your head.</small></div></div>
+
+    <aside class="notes">
+      <p>The retro is the centre of the lifecycle and the last hands-on step. The point is that the cycle improves every time you go round it.</p>
+      <p>Run the <strong>/retro</strong> skill on the session you just finished. It reads the session and looks for improvements to the agent's environment: missing instructions, unclear skills, checks that would have caught a problem earlier. Pick one improvement and write it into a file in the repository.</p>
+      <p>This is how trust grows. Each retro turns a mistake or a slow step into something the next session does not have to rediscover.</p>
+      <p>Next slide: why you should not automate this. <strong>Do not automate the retro.</strong> It is tempting to let an agent run the retro and apply every suggestion by itself. That causes drift: every session adds a rule, and soon you have a huge AGENTS.md and pile of skills that the agent half-ignores, and a setup that may break with the next model. You have to verify the suggestions yourself and choose what changes and what does not. Small and deliberate beats big and automatic.</p>
+    </aside>
+  </section>
+
+<section class="slide" data-title="Retro control">
+    <p class="kicker">27 / retro</p>
+    <h2 class="h2">Do not automate<br><span class="accent-text">the retro.</span></h2>
+    <div class="drift mt-l">
+      <div class="drift-card no"><span>AUTOMATED RETRO</span><div class="drift-flow"><em>Agent adds every lesson</em><i>→</i><em>Skills and setup keep growing</em><i>→</i><em>Agent half-ignores it</em><i>→</i><em>New model: setup breaks</em></div><strong>Drift</strong></div>
+      <div class="drift-card yes"><span>YOU IN THE LOOP</span><div class="drift-flow"><em>You read the suggestions</em><i>→</i><em>You verify and pick one</em><i>→</i><em>Setup stays small</em><i>→</i><em>New model: still flexible</em></div><strong>Trust</strong></div>
+    </div>
+    <aside class="notes">
+      <p>It is tempting to let an agent run the retro and apply every suggestion by itself. That causes drift: every session adds a rule or a skill, and soon you have a huge AGENTS.md and a pile of skills and harness setup that nobody has read and that the agent half-ignores. It also makes you less flexible: when a new model comes out, a heavy setup tuned to the old one may not work anymore.</p>
+      <p>The retro is where you stay in control. You verify the suggestions yourself and choose what changes and what does not. Small and deliberate beats big and automatic.</p>
+    </aside>
+  </section>
+
+  <section class="slide pausedo-slide" data-title="Pause: Retro">
+    <p class="kicker">pause + do / retro</p>
+    <div class="pd-grid">
+      <div class="pd-left"><div class="pd-badge">PAUSE + DO</div><h2 class="h2">Run the retro<br><span class="accent-text">yourself.</span></h2><p class="pd-goal">Make the next cycle a bit better than this one.</p></div>
+      <ol class="pd-steps"><li><b>01</b><span>Run <span class="mono">/retro</span> on your session.</span></li><li><b>02</b><span>Read every suggestion. Do not apply them all.</span></li><li><b>03</b><span>Pick the one that would have saved you the most time.</span></li><li><b>04</b><span>Write it into the repository: a rule, a skill tweak or a guard.</span></li></ol>
+    </div>
+    <div class="pd-done"><span>DONE WHEN</span><strong>One small improvement is saved in the repository, nothing more.</strong></div>
+    <aside class="notes"><p>Stress the control: they choose what changes and what does not. One improvement is enough. A small setup stays flexible and the agent follows it.</p></aside>
+  </section>
+
+
+  <section class="slide closing" data-title="Takeaways">
+      <p class="kicker">28 / close</p>
+    <h2 class="h1">Trust is built,<br><span class="accent-text">not bought.</span></h2>
+    <div class="close-grid mt-l"><div class="takeaways"><div><b>01</b><span>Stay in the loop first. You decide, the agent proposes.</span></div><div><b>02</b><span>Write down what you learn: specs, skills, guards, retros.</span></div><div><b>03</b><span>Then step back. A pricier model can't always fix a missing process.</span></div></div>
+    <div class="mini-stairs"><div style="--h:30px"><b></b><span>Chat</span></div><div style="--h:50px"><b></b><span>Single agent</span></div><div class="here" style="--h:70px"><b></b><span>In the loop · today</span></div><div style="--h:90px"><b></b><span>On the loop</span></div><div style="--h:110px"><b></b><span>Software factory</span></div></div></div>
+    <aside class="notes">
+      <p>One point to take home: <strong>trust is built, not bought</strong>. You can build towards a software factory where agents build for you. But if you start there, before your agents have built trust with you in the loop, you get AI slop and a big token bill. Switching to the most expensive model does not fix that. It is a setup problem.</p>
+      <p>First, stay in the loop. You decide, the agent proposes. Second, write down what you learn: specs, skills, guards and retros, so the next cycle is better than this one. Third, only then step back. Choose the model and context for the task, keep context small, and remember that a pricier model can't always fix a missing process.</p>
+      <p>Climb one rung at a time. Today was rung three. Keep practising after today.</p>
+    </aside>
+  </section>
+
+</div>
+<script src="../.agents/skills/html-ppt/assets/runtime.js"></script>
+<script src="platform-flow.js"></script>
+<script src="media.js"></script>
+<script src="quiz.js"></script>
+</body>
+</html>

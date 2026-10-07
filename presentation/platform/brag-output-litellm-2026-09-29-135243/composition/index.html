@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteLLM on PEX — what happens to one OpenCode request</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    :root {
+      --ink: #07111f;
+      --panel: #0e1d30;
+      --panel-2: #122740;
+      --line: #29425b;
+      --text: #f3f0e8;
+      --muted: #b4c2d1;
+      --amber: #f2a65a;
+      --amber-soft: #b86f34;
+      --green: #7fd0b0;
+      --red: #f09a84;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--ink); }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text); }
+    #main { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); }
+
+    .ambient { position: absolute; left: -200px; top: -200px; width: 2320px; height: 1480px; pointer-events: none;
+      background: radial-gradient(ellipse 720px 540px at 72% 40%, rgba(242,166,90,.11), transparent 72%),
+                  radial-gradient(ellipse 820px 480px at 16% 88%, rgba(27,67,104,.32), transparent 72%); }
+    .grid { position: absolute; inset: 0; opacity: .16; pointer-events: none;
+      background-image: linear-gradient(rgba(180,194,209,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(180,194,209,.09) 1px, transparent 1px);
+      background-size: 72px 72px; mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent); }
+    .scanline { position: absolute; left: 0; top: 0; width: 2px; height: 1080px; background: linear-gradient(to bottom, transparent, rgba(242,166,90,.35), transparent); opacity: .5; }
+    .progress { position: absolute; left: 96px; right: 96px; bottom: 52px; height: 3px; background: rgba(41,66,91,.7); border-radius: 3px; }
+    .progress-fill { position: absolute; inset: 0; background: var(--amber); transform-origin: left center; transform: scaleX(0); border-radius: 3px; }
+
+    .clip { position: absolute; inset: 0; }
+    .scene { position: absolute; inset: 0; }
+    .hidden { opacity: 0; }
+
+    .topline { position: absolute; top: 64px; left: 96px; right: 96px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+    .brand span { color: var(--amber); }
+    .micro { font: 600 20px/1.1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .amber { color: var(--amber); }
+    .green { color: var(--green); }
+    .eyebrow { font: 600 22px/1.1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
+    .headline { margin: 18px 0 0; font-size: 76px; line-height: 1; letter-spacing: -.05em; font-weight: 700; }
+    .title-block { position: absolute; left: 96px; top: 140px; width: 1500px; }
+    .card { position: absolute; border: 2px solid var(--line); border-radius: 16px; background: rgba(14,29,48,.92); box-shadow: 0 30px 90px rgba(0,0,0,.28); }
+    .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px rgba(127,208,176,.7); }
+
+    /* scene 1 — hook */
+    .hook-copy { position: absolute; left: 96px; top: 250px; width: 820px; }
+    .hook-copy .headline { font-size: 116px; line-height: .96; }
+    .hook-sub { margin-top: 34px; color: var(--muted); font-size: 34px; line-height: 1.3; letter-spacing: -.01em; width: 760px; }
+    .editor { left: 1000px; top: 180px; width: 824px; height: 700px; overflow: hidden; }
+    .editor-bar { display: flex; align-items: center; gap: 12px; padding: 20px 26px; border-bottom: 2px solid var(--line); }
+    .editor-bar i { width: 14px; height: 14px; border-radius: 50%; background: #2c4661; display: inline-block; }
+    .editor-bar .file { margin-left: 14px; font: 600 21px/1 var(--mono); color: var(--muted); }
+    .code { padding: 22px 30px; font: 22px/1.55 var(--mono); color: var(--muted); white-space: pre; }
+    .code .k { color: var(--text); }
+    .code .s { color: var(--amber); }
+    .code .hl { color: var(--green); }
+    .prompt { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 30px; border-top: 2px solid var(--line); background: rgba(18,39,64,.95); }
+    .prompt-line { font: 600 26px/1.2 var(--mono); color: var(--text); }
+    .prompt-line b { color: var(--amber); }
+    .send-chip { margin-top: 16px; display: inline-flex; gap: 14px; align-items: center; padding: 10px 16px; border: 2px solid var(--amber-soft); border-radius: 10px; font: 600 21px/1 var(--mono); color: var(--amber); }
+
+    /* scene 2 — edge */
+    .pipe { position: absolute; left: 96px; top: 440px; width: 1728px; height: 270px; }
+    .node { position: absolute; top: 0; width: 378px; height: 270px; padding: 26px; }
+    .node .n { font: 700 20px/1 var(--mono); color: var(--amber); letter-spacing: .08em; }
+    .node h3 { margin: 16px 0 12px; font-size: 36px; line-height: 1.05; letter-spacing: -.03em; }
+    .node p { margin: 0; font: 21px/1.45 var(--mono); color: var(--muted); }
+    .node-1 { left: 0; } .node-2 { left: 450px; } .node-3 { left: 900px; } .node-4 { left: 1350px; border-color: var(--amber-soft); }
+    .link { position: absolute; top: 134px; height: 3px; width: 72px; background: var(--amber); transform-origin: left center; }
+    .link-1 { left: 378px; } .link-2 { left: 828px; } .link-3 { left: 1278px; }
+    .packet { position: absolute; top: 124px; left: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 30px rgba(242,166,90,.9); }
+    .failclosed { left: 96px; top: 780px; width: 1728px; height: 110px; padding: 0 34px; display: flex; align-items: center; justify-content: space-between; border-color: var(--amber-soft); }
+    .failclosed code { font: 600 28px/1 var(--mono); color: var(--amber); }
+    .failclosed span { font-size: 28px; color: var(--text); }
+
+    /* scene 3 — guardrails */
+    .msg { left: 96px; top: 360px; width: 950px; height: 520px; padding: 30px 34px; }
+    .msg-head { display: flex; justify-content: space-between; padding-bottom: 20px; border-bottom: 2px solid var(--line); }
+    .msg-line { position: relative; margin-top: 30px; height: 62px; font: 27px/62px var(--mono); color: var(--text); }
+    .msg-line .lbl { color: var(--muted); }
+    .swap { position: relative; display: inline-block; min-width: 460px; }
+    .swap .orig, .swap .red { position: absolute; left: 0; top: 0; white-space: nowrap; }
+    .swap .red { color: var(--green); font-weight: 700; opacity: 0; }
+    .swap .bar { position: absolute; left: -6px; top: 10px; height: 42px; width: 470px; background: rgba(127,208,176,.14); border: 2px solid rgba(127,208,176,.5); border-radius: 8px; transform-origin: left center; transform: scaleX(0); }
+    .guards { left: 1090px; top: 360px; width: 734px; height: 520px; padding: 26px 24px; }
+    .guard { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 19px 0; border-bottom: 2px solid rgba(41,66,91,.8); }
+    .guard:last-child { border-bottom: 0; }
+    .guard b { display: block; font: 700 23px/1.1 var(--mono); color: var(--text); }
+    .guard small { display: block; margin-top: 8px; font-size: 21px; color: var(--muted); }
+    .guard .st { transform-origin: right center; font: 700 20px/1 var(--mono); color: var(--green); letter-spacing: .08em; }
+
+    /* scene 4 — router */
+    .dims { left: 96px; top: 330px; width: 820px; height: 590px; padding: 28px 32px; }
+    .dim { display: grid; grid-template-columns: 290px 60px 1fr; align-items: center; gap: 16px; height: 56px; }
+    .dim span { font: 21px/1 var(--mono); color: var(--muted); }
+    .dim em { font: 700 21px/1 var(--mono); color: var(--text); font-style: normal; }
+    .track { position: relative; height: 14px; border-radius: 8px; background: rgba(41,66,91,.8); overflow: hidden; }
+    .fill { position: absolute; inset: 0; background: var(--amber); border-radius: 8px; transform-origin: left center; transform: scaleX(0); }
+    .rule { margin-top: 22px; padding: 16px 20px; border: 2px dashed var(--amber-soft); border-radius: 12px; font: 600 22px/1.3 var(--mono); color: var(--amber); }
+    .scale { left: 970px; top: 330px; width: 854px; height: 250px; padding: 28px 32px; }
+    .scale-bar { position: absolute; left: 32px; right: 32px; top: 120px; height: 18px; border-radius: 10px; background: linear-gradient(90deg, #1f3a55 0 30%, #2b4a66 30% 55%, #6b4a2c 55% 75%, #8a4e2a 75% 100%); }
+    .tick { position: absolute; top: 100px; width: 3px; height: 58px; background: var(--text); opacity: .7; }
+    .tier { position: absolute; top: 176px; font: 700 20px/1 var(--mono); color: var(--muted); letter-spacing: .06em; }
+    .needle { position: absolute; top: 88px; left: 32px; width: 6px; height: 82px; margin-left: -3px; border-radius: 3px; background: var(--amber); box-shadow: 0 0 24px rgba(242,166,90,.9); }
+    .score { position: absolute; right: 32px; top: 28px; font: 700 30px/1 var(--mono); color: var(--amber); }
+    .pick { top: 612px; width: 412px; height: 308px; padding: 26px 28px; }
+    .pick-a { left: 970px; } .pick-b { left: 1412px; border-color: var(--amber); }
+    .pick h4 { margin: 14px 0 18px; font: 700 28px/1.15 var(--mono); }
+    .pick p { margin: 0; font: 21px/1.5 var(--mono); color: var(--muted); }
+    .pick .arrow { color: var(--amber); }
+
+    /* scene 5 — resilience + telemetry */
+    .col { top: 330px; height: 470px; width: 548px; padding: 28px 30px; }
+    .col-1 { left: 96px; } .col-2 { left: 686px; } .col-3 { left: 1276px; }
+    .col h4 { margin: 14px 0 22px; font-size: 34px; letter-spacing: -.03em; }
+    .chain div { margin-bottom: 14px; padding: 14px 16px; border: 2px solid var(--line); border-radius: 10px; font: 600 21px/1.2 var(--mono); }
+    .chain .fail { color: var(--red); border-color: rgba(240,154,132,.5); }
+    .chain .ok { color: var(--green); border-color: rgba(127,208,176,.6); }
+    .col .note { font: 21px/1.45 var(--mono); color: var(--muted); }
+    .span { position: relative; height: 50px; margin-bottom: 10px; }
+    .span .sb { position: absolute; top: 0; height: 42px; border-radius: 8px; background: rgba(242,166,90,.2); border: 2px solid var(--amber-soft); transform-origin: left center; }
+    .span .sl { position: absolute; top: 11px; left: 12px; font: 600 20px/1 var(--mono); color: var(--text); white-space: nowrap; }
+    .pods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
+    .pod { height: 96px; border: 2px solid var(--line); border-radius: 12px; display: flex; align-items: center; justify-content: center; font: 700 20px/1 var(--mono); color: var(--muted); }
+    .pod.on { border-color: var(--green); color: var(--green); }
+    .done { left: 96px; top: 834px; width: 1728px; height: 96px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-color: var(--green); }
+    .done code { font: 700 28px/1 var(--mono); color: var(--green); }
+    .done span { font: 24px/1 var(--mono); color: var(--muted); }
+
+    /* scene 6 — outro */
+    .outro { position: absolute; left: 0; right: 0; top: 280px; text-align: center; }
+    .outro .headline { font-size: 132px; }
+    .outro .headline span { color: var(--amber); }
+    .outro-sub { margin: 34px auto 0; width: 1240px; font-size: 36px; line-height: 1.3; color: var(--muted); }
+    .outro-code { margin: 48px auto 0; display: inline-flex; gap: 22px; padding: 18px 26px; border: 2px solid var(--amber-soft); border-radius: 12px; font: 600 28px/1 var(--mono); color: var(--text); background: rgba(14,29,48,.9); }
+    .outro-code b { color: var(--amber); }
+  </style>
+</head>
+<body>
+  <div id="main" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="30">
+    <div class="ambient"></div>
+    <div class="grid"></div>
+    <div class="scanline"></div>
+    <div class="progress"><div class="progress-fill"></div></div>
+
+    <section id="scene-hook" class="clip" data-start="0" data-duration="4" data-track-index="0">
+      <div class="scene s1">
+        <div class="topline s1-a hidden">
+          <div class="brand">litellm<span>/</span>pex</div>
+          <div class="micro">request trace · 01 / 05</div>
+        </div>
+        <div class="hook-copy s1-a hidden">
+          <div class="eyebrow">opencode → workshop-gateway</div>
+          <h1 class="headline">One prompt.<br>Seven hops.</h1>
+          <div class="hook-sub">What happens between <b style="color:var(--text)">Enter</b> and the first streamed token.</div>
+        </div>
+        <div class="card editor s1-b hidden">
+          <div class="editor-bar"><i></i><i></i><i></i><span class="file">~/.config/opencode/opencode.json</span></div>
+          <div class="code"><span class="k">"provider"</span>: {
+  <span class="k">"workshop-gateway"</span>: {
+    <span class="k">"npm"</span>: <span class="s">"@ai-sdk/openai-compatible"</span>,
+    <span class="k">"options"</span>: {
+      <span class="k">"baseURL"</span>: <span class="s">"https://&lt;gateway&gt;/v1"</span>,
+      <span class="k">"apiKey"</span>: <span class="s">"{env:WORKSHOP_API_KEY}"</span>
+    },
+    <span class="k">"models"</span>: { <span class="hl">"gpt-router"</span>, <span class="hl">"claude-router"</span> }
+  }
+}</div>
+          <div class="prompt">
+            <div class="prompt-line"><b>›</b> refactor the code in auth/session.ts</div>
+            <div class="send-chip s1-c hidden"><span class="dot"></span>POST /v1/chat/completions · model: claude-router</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene-edge" class="clip" data-start="4" data-duration="5.2" data-track-index="1">
+      <div class="scene s2">
+        <div class="topline"><div class="brand">litellm<span>/</span>pex</div><div class="micro">hops 1–4 · edge &amp; identity · 02 / 05</div></div>
+        <div class="title-block s2-t hidden">
+          <div class="eyebrow">before any model is touched</div>
+          <h2 class="headline">Trusted before it's routed.</h2>
+        </div>
+        <div class="pipe">
+          <div class="card node node-1 hidden"><div class="n">01 · CLIENT</div><h3>OpenCode</h3><p>Bearer virtual key<br>sk-••••••••••<br>SSE stream: on</p></div>
+          <div class="card node node-2 hidden"><div class="n">02 · INGRESS</div><h3>Istio gateway</h3><p>TLS terminated<br>VirtualService →<br>litellm-proxy:4000</p></div>
+          <div class="card node node-3 hidden"><div class="n">03 · MESH</div><h3>AuthZ policy</h3><p>mTLS principals<br>allow-list only<br>NetworkPolicy egress</p></div>
+          <div class="card node node-4 hidden"><div class="n">04 · GATEWAY</div><h3>LiteLLM proxy</h3><p>key → team → budget<br>Postgres-backed<br>rate + spend limits</p></div>
+          <div class="link link-1"></div><div class="link link-2"></div><div class="link link-3"></div>
+          <div class="packet hidden"></div>
+        </div>
+        <div class="card failclosed s2-f hidden">
+          <code>allow_requests_on_db_unavailable: false</code>
+          <span>No budget check → no request. Fail-closed.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene-guard" class="clip" data-start="9.2" data-duration="5.4" data-track-index="2">
+      <div class="scene s3">
+        <div class="topline"><div class="brand">litellm<span>/</span>pex</div><div class="micro">hop 5 · pre_call guardrails · 03 / 05</div></div>
+        <div class="title-block s3-t hidden">
+          <div class="eyebrow">default_on · runs on every call</div>
+          <h2 class="headline">Your prompt gets scrubbed.</h2>
+        </div>
+        <div class="card msg s3-m hidden">
+          <div class="msg-head"><span class="micro">messages[1].content</span><span class="micro amber">example payload</span></div>
+          <div class="msg-line r1"><span class="lbl">user: </span><span class="swap" data-layout-allow-overlap><span class="bar"></span><span class="orig">jan.devries&#64;example.nl</span><span class="red">[EMAIL_REDACTED]</span></span></div>
+          <div class="msg-line r2"><span class="lbl">bsn:  </span><span class="swap" data-layout-allow-overlap><span class="bar"></span><span class="orig">123456782</span><span class="red">[BSN_REDACTED]</span></span></div>
+          <div class="msg-line r3"><span class="lbl">env:  </span><span class="swap" data-layout-allow-overlap><span class="bar"></span><span class="orig">AWS_SECRET=wJalr…EXAMPLE</span><span class="red">[SECRET_REDACTED]</span></span></div>
+          <div class="msg-line r4"><span class="lbl">tel:  </span><span class="swap" data-layout-allow-overlap><span class="bar"></span><span class="orig">06-12345678</span><span class="red">[NL_PHONE_REDACTED]</span></span></div>
+        </div>
+        <div class="card guards s3-g hidden">
+          <div class="guard g1"><div><b>headroom-compression</b><small>context compressed · fail_open</small></div><span class="st">PASS</span></div>
+          <div class="guard g2"><div><b>pii-masking-pre-guard</b><small>BSN · email · phone · card · passport</small></div><span class="st">MASK</span></div>
+          <div class="guard g3"><div><b>hide-secrets-pre-guard</b><small>detect_secrets on keys &amp; tokens</small></div><span class="st">MASK</span></div>
+          <div class="guard g4"><div><b>gdpr-eu-* (4 packs)</b><small>national · contact · business · finance</small></div><span class="st">MASK</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene-router" class="clip" data-start="14.6" data-duration="6.4" data-track-index="3">
+      <div class="scene s4">
+        <div class="topline"><div class="brand">litellm<span>/</span>pex</div><div class="micro">hop 6 · auto_router/complexity_router · 04 / 05</div></div>
+        <div class="title-block s4-t hidden">
+          <div class="eyebrow">model: "claude-router" is a policy, not a model</div>
+          <h2 class="headline">The router reads the task.</h2>
+        </div>
+        <div class="card dims s4-d hidden">
+          <div class="micro" style="margin-bottom:14px">dimension · weight · signal</div>
+          <div class="dim"><span>reasoningMarkers</span><em>.25</em><div class="track"><div class="fill f1"></div></div></div>
+          <div class="dim"><span>codePresence</span><em>.20</em><div class="track"><div class="fill f2"></div></div></div>
+          <div class="dim"><span>technicalTerms</span><em>.15</em><div class="track"><div class="fill f3"></div></div></div>
+          <div class="dim"><span>multiStepPatterns</span><em>.15</em><div class="track"><div class="fill f4"></div></div></div>
+          <div class="dim"><span>tokenCount</span><em>.10</em><div class="track"><div class="fill f5"></div></div></div>
+          <div class="dim"><span>simpleIndicators</span><em>.10</em><div class="track"><div class="fill f6"></div></div></div>
+          <div class="dim"><span>questionComplexity</span><em>.05</em><div class="track"><div class="fill f7"></div></div></div>
+          <div class="rule s4-r hidden">keyword rule: "refactor the code" → COMPLEX</div>
+        </div>
+        <div class="card scale s4-s hidden">
+          <div class="micro">tier boundaries</div>
+          <div class="score">score <span class="score-n">0.00</span></div>
+          <div class="scale-bar"></div>
+          <div class="tick" style="left:268px"></div><div class="tick" style="left:463px"></div><div class="tick" style="left:619px"></div>
+          <div class="tier" style="left:32px">SIMPLE</div><div class="tier" style="left:282px">MEDIUM</div><div class="tier" style="left:477px">COMPLEX</div><div class="tier" style="left:633px">REASONING</div>
+          <div class="needle"></div>
+        </div>
+        <div class="card pick pick-a s4-a hidden">
+          <div class="micro">gpt-router · global</div>
+          <h4>COMPLEX <span class="arrow">→</span><br>gpt-5.6-luna-xhigh</h4>
+          <p>classifier: gpt-6-luna-none<br>timeout 3000 ms</p>
+        </div>
+        <div class="card pick pick-b s4-b hidden">
+          <div class="micro amber">claude-router · EU only</div>
+          <h4>COMPLEX <span class="arrow">→</span><br>claude-sonnet-4.6</h4>
+          <p>classifier: haiku-4.5<br>tools + cache_control kept</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene-ops" class="clip" data-start="21" data-duration="5.2" data-track-index="4">
+      <div class="scene s5">
+        <div class="topline"><div class="brand">litellm<span>/</span>pex</div><div class="micro">hop 7 · provider, resilience &amp; telemetry · 05 / 05</div></div>
+        <div class="title-block s5-t hidden">
+          <div class="eyebrow">what you never have to handle in OpenCode</div>
+          <h2 class="headline">Failures stay invisible.</h2>
+        </div>
+        <div class="card col col-1 c1 hidden">
+          <div class="micro">router_settings</div>
+          <h4>Retry → fallback</h4>
+          <div class="chain">
+            <div class="fail ch1">✕ sonnet-4.6 · 429 → cooldown 30s</div>
+            <div class="ok ch2">✓ retry 2/3 · served</div>
+            <div class="ch3">fallback: haiku-4.5-bedrock</div>
+          </div>
+          <div class="note">cooldowns shared across pods via Valkey</div>
+        </div>
+        <div class="card col col-2 c2 hidden">
+          <div class="micro">otel → langfuse · prometheus</div>
+          <h4>Every hop traced</h4>
+          <div class="span"><div class="sb sp1" style="left:0;width:150px"></div><span class="sl">guardrails</span></div>
+          <div class="span"><div class="sb sp2" style="left:110px;width:170px"></div><span class="sl" style="left:122px">classify</span></div>
+          <div class="span"><div class="sb sp3" style="left:230px;width:254px"></div><span class="sl" style="left:242px">completion</span></div>
+          <div class="span"><div class="sb sp4" style="left:0;width:484px"></div><span class="sl">spend · audit log (365d)</span></div>
+        </div>
+        <div class="card col col-3 c3 hidden">
+          <div class="micro">keda scaledobject</div>
+          <h4>Capacity follows load</h4>
+          <div class="pods"><div class="pod on">pod 1</div><div class="pod on">pod 2</div><div class="pod p3">pod 3</div><div class="pod p4">pod 4</div></div>
+          <div class="note">min 2 · max 4<br>cpu 60% · memory trigger<br>PDB keeps the floor</div>
+        </div>
+        <div class="card done s5-d hidden">
+          <code>200 OK · stream · model: claude-sonnet-4.6-bedrock</code>
+          <span>back in OpenCode · same OpenAI contract</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene-outro" class="clip" data-start="26.2" data-duration="3.8" data-track-index="5">
+      <div class="scene s6">
+        <div class="outro">
+          <div class="eyebrow s6-e hidden">one endpoint · seven hops · zero client changes</div>
+          <h2 class="headline s6-h hidden">LiteLLM <span>on PEX</span></h2>
+          <div class="outro-sub s6-s hidden">Guardrails, complexity routing, fallbacks and traces — behind the same OpenCode provider.</div>
+          <div class="outro-code s6-c hidden"><span>model:</span><b>gpt-router</b><span>|</span><b>claude-router</b></div>
+        </div>
+      </div>
+    </section>
+
+    <audio id="bg-music" data-start="0" data-duration="30" data-track-index="10"
+      data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.22},{"t":28.4,"v":0.22},{"t":30,"v":0}]}]}'
+      src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
+  </div>
+
+  <script>
+    (() => {
+      const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+      const show = (sel, at, d = 0.55, from = {}) => tl.fromTo(sel, { opacity: 0, y: 20, ...from }, { opacity: 1, y: 0, x: 0, scale: 1, duration: d }, at);
+      const exit = (sel, at) => tl.to(sel, { opacity: 0, scale: 0.97, duration: 0.3, ease: 'power2.in' }, at);
+      const enter = (sel, at) => tl.fromTo(sel, { scale: 1.035 }, { scale: 1, duration: 0.7, ease: 'power3.out' }, at);
+
+      tl.fromTo('.ambient', { x: 0, y: 0 }, { x: -140, y: 60, duration: 30, ease: 'none' }, 0);
+      tl.fromTo('.scanline', { x: 0 }, { x: 1920, duration: 30, ease: 'none' }, 0);
+      tl.fromTo('.progress-fill', { scaleX: 0 }, { scaleX: 1, duration: 30, ease: 'none' }, 0);
+
+      // beat-locked: 1.60s send; the hook now holds longer before the transition.
+      show('.s1-a', 0.1, 0.7);
+      show('.s1-b', 0.4, 0.8, { x: 32, y: 0 });
+      show('.s1-c', 1.6, 0.5, { scale: 0.94, y: 0 });
+      tl.to('.s1-c', { boxShadow: '0 0 34px rgba(242,166,90,.55)', duration: 0.26, yoyo: true, repeat: 1 }, 2.12);
+      exit('.s1', 3.72);
+
+      // Slower hop reveal: each card gets a readable hold before the packet moves on.
+      enter('.s2', 4.0);
+      show('.s2-t', 4.12, 0.65);
+      show('.node-1', 4.55, 0.55);
+      tl.fromTo('.packet', { opacity: 0, x: 170 }, { opacity: 1, duration: 0.3 }, 4.85);
+      [['.link-1', '.node-2', 5.95, 620], ['.link-2', '.node-3', 6.65, 1070], ['.link-3', '.node-4', 7.35, 1520]].forEach(([l, n, t, px]) => {
+        tl.fromTo(l, { scaleX: 0 }, { scaleX: 1, duration: 0.26, ease: 'power2.inOut' }, t - 0.3);
+        tl.to('.packet', { x: px, duration: 0.42, ease: 'power2.inOut' }, t - 0.3);
+        show(n, t, 0.55);
+      });
+      tl.to('.packet', { opacity: 0, scale: 0.4, duration: 0.25 }, 7.7);
+      tl.to('.node-4', { borderColor: '#F2A65A', duration: 0.3 }, 7.9);
+      show('.s2-f', 8.05, 0.55);
+      exit('.s2', 8.9);
+
+      // Redactions are deliberately spaced out so the transformation can be read.
+      enter('.s3', 9.2);
+      show('.s3-t', 9.3, 0.65);
+      show('.s3-m', 9.5, 0.65, { x: -24, y: 0 });
+      show('.s3-g', 9.65, 0.65, { x: 24, y: 0 });
+      [['.r1', '.g2', 10.3], ['.r2', '.g4', 11.0], ['.r3', '.g3', 11.7], ['.r4', '.g2', 12.4]].forEach(([r, g, t]) => {
+        tl.to(r + ' .bar', { scaleX: 1, duration: 0.24, ease: 'power2.inOut' }, t - 0.22);
+        tl.to(r + ' .orig', { opacity: 0, duration: 0.14 }, t);
+        tl.fromTo(r + ' .red', { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.22 }, t);
+        tl.fromTo(g + ' .st', { scale: 1 }, { scale: 1.25, duration: 0.14, yoyo: true, repeat: 1 }, t);
+      });
+      tl.fromTo('.g1 .st', { scale: 1 }, { scale: 1.18, duration: 0.18, yoyo: true, repeat: 1 }, 9.8);
+      exit('.s3', 14.28);
+
+      // Slower scoring pass: the dimensions fill one by one instead of flashing in.
+      enter('.s4', 14.6);
+      show('.s4-t', 14.72, 0.65);
+      show('.s4-d', 15.0, 0.65, { x: -24, y: 0 });
+      show('.s4-s', 15.25, 0.65, { x: 24, y: 0 });
+      [[1, .55], [2, .9], [3, .7], [4, .6], [5, .35], [6, .1], [7, .4]].forEach(([i, v], k) => {
+        tl.to('.f' + i, { scaleX: v, duration: 0.65, ease: 'power2.out' }, 15.75 + k * 0.25);
+      });
+      show('.s4-r', 17.5, 0.5);
+      const score = { v: 0 };
+      tl.to(score, { v: 0.62, duration: 0.6, ease: 'power2.inOut', onUpdate: () => {
+        const el = document.querySelector('.score-n'); if (el) el.textContent = score.v.toFixed(2);
+      } }, 17.6);
+      tl.fromTo('.needle', { x: 0 }, { x: 0.62 * 790, duration: 0.85, ease: 'power2.inOut' }, 17.6);
+      tl.to('.needle', { boxShadow: '0 0 40px rgba(242,166,90,1)', duration: 0.25, yoyo: true, repeat: 1 }, 18.45);
+      show('.s4-a', 18.6, 0.55);
+      show('.s4-b', 19.2, 0.55);
+      tl.to('.pick-a', { opacity: 0.55, duration: 0.35 }, 19.85);
+      exit('.s4', 20.65);
+
+      // More air between the three operational proof points.
+      enter('.s5', 21.0);
+      show('.s5-t', 21.1, 0.65);
+      show('.c1', 21.5, 0.55);
+      show('.c2', 22.1, 0.55);
+      show('.c3', 22.7, 0.55);
+      show('.ch1', 23.1, 0.4, { x: -12, y: 0 });
+      show('.ch2', 23.8, 0.4, { x: -12, y: 0 });
+      show('.ch3', 24.4, 0.4, { x: -12, y: 0 });
+      ['.sp1', '.sp2', '.sp3', '.sp4'].forEach((s, k) => tl.fromTo(s, { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: 'power2.out' }, 22.35 + k * 0.35));
+      tl.to('.p3', { borderColor: '#7FD0B0', color: '#7FD0B0', duration: 0.3 }, 23.8);
+      tl.to('.p4', { borderColor: '#7FD0B0', color: '#7FD0B0', duration: 0.3 }, 24.4);
+      show('.s5-d', 25.1, 0.55, { scale: 0.98, y: 0 });
+      exit('.s5', 25.9);
+
+      // Outro enters gently and holds for the final read.
+      show('.s6-e', 26.3, 0.55);
+      show('.s6-h', 26.5, 0.75, { scale: 0.96, y: 16 });
+      show('.s6-s', 27.35, 0.6);
+      show('.s6-c', 28.0, 0.6);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines.main = tl;
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+/* LiteLLM gateway slides in the main deck.
+   The html-ppt runtime owns .slide positioning and visibility. */
+.tpl-workshop .slide {
+  transform: none;
+  transition: opacity .35s ease;
+}
+.tpl-workshop .slide.is-prev { transform: none; }
+
+/* Evidence image on the developer-experience slide. Keep a visible gap below the sentence. */
+.gateway-scope-slide .gateway-scope-evidence {
+  width: min(1050px, 78%) !important;
+  margin-top: 120px !important;
+}
+.gateway-scope-slide .gateway-scope-evidence img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 545px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.ll-slide {
+  --ll-surface: #131b31;
+  --ll-surface-2: #1a2540;
+  --ll-text: #f3f6ff;
+  --ll-muted: #b0bdd8;
+  --ll-line: #3a4a75;
+  --ll-amber: #ffbe78;
+  --ll-magenta: #de0073;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  padding: 70px 90px !important;
+  background: var(--bg) !important;
+  color: var(--ll-text);
+  font-family: var(--font-sans, Inter, sans-serif);
+  text-align: left;
+}
+
+.ll-title {
+  margin: 0;
+  color: var(--ll-text);
+  align-self: flex-start;
+  text-align: left;
+}
+.ll-slide .ll-container { margin-top: 36px; justify-content: flex-start; }
+.ll-slide .ll-right { max-width: 1060px; }
+.ll-slide .ll-footnote { margin-top: 28px; }
+
+.ll-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 44px;
+}
+
+.ll-left { flex: 0 0 auto; }
+.ll-right { flex: 1 1 auto; min-width: 0; }
+
+.ll-box {
+  min-width: 390px;
+  padding: 32px 44px;
+  border: 3px solid var(--accent);
+  border-radius: 16px;
+  background: var(--ll-surface-2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .2);
+}
+
+.ll-box-title { margin: 0 0 6px; font-size: 38px; line-height: 1.1; font-weight: 750; }
+.ll-box-sub { margin: 0; color: var(--accent); font-size: 19px; }
+
+.ll-panel {
+  min-width: 680px;
+  padding: 26px;
+  border: 2px solid var(--ll-line);
+  border-radius: 14px;
+  background: var(--ll-surface);
+  text-align: left;
+}
+
+.ll-offer-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.ll-offer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ll-line);
+  border-radius: 10px;
+  background: var(--ll-surface-2);
+}
+.ll-offer-group .kind {
+  margin-bottom: 6px;
+  color: var(--accent);
+  font: 700 13px/1.2 var(--font-sans, sans-serif);
+  text-transform: uppercase;
+}
+.ll-offer-group code {
+  color: var(--ll-text);
+  font: 15px/1.3 var(--font-mono, monospace);
+  white-space: nowrap;
+}
+.ll-offer-note {
+  margin-top: 18px;
+  color: var(--ll-muted);
+  font-size: 14px;
+}
+
+.ll-panel-title {
+  margin: 0 0 18px;
+  color: var(--ll-amber);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.ll-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--ll-line);
+  border-radius: 10px;
+  background: var(--ll-surface-2);
+}
+.ll-card + .ll-card { margin-top: 12px; }
+
+.ll-logo {
+  display: flex;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 9px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #f7f8fc;
+}
+.ll-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ll-card-content { min-width: 0; flex: 1; }
+.ll-card-name { font-size: 21px; font-weight: 700; }
+
+.ll-slide > svg { flex: 0 0 100px; overflow: visible; }
+.ll-slide > svg line { stroke: var(--accent); }
+
+.ll-footnote { margin: 0; color: var(--ll-muted); font-size: 15px; }
+
+/* Small orientation aid for the platform section. It stays on the canvas,
+   while the runtime continues to own slide navigation and positioning. */
+.platform-flow-indicator {
+  position: fixed !important;
+  right: 42px;
+  bottom: 30px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(176, 189, 216, .42);
+  font: 700 13px/1 var(--font-mono, monospace);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.tpl-workshop .slide > .platform-flow-indicator { position: fixed !important; }
+.platform-flow-step { transition: color .25s ease, opacity .25s ease; }
+.platform-flow-step.is-active { color: var(--accent); opacity: 1; }
+.platform-flow-arrow { color: rgba(176, 189, 216, .24); font-size: 16px; }
+
+/* Keep the gateway capability panel focused on its content, not the
+   decorative client/gateway bubbles that were used in the old layout. */
+.capability-stage > .capability-context { display: none; }
+
+.pii-masking-slide .capability-stage {
+  display: block;
+  height: auto;
+  max-width: 1240px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.pii-masking-slide .capability-panel {
+  min-height: 0;
+  padding: 42px 48px;
+}
+.pii-masking-slide .capability-detail h3 { margin-top: 18px; }
+.pii-transform {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 26px 0;
+  color: var(--ll-text);
+}
+.pii-transform code {
+  display: inline-block;
+  padding: 14px 18px;
+  border: 1px solid var(--ll-line);
+  border-radius: 8px;
+  background: var(--ll-surface-2);
+}
+.pii-transform span { color: var(--accent); font-size: 28px; }
+
+.ll-logo-text {
+  color: #151b2f;
+  font: 800 22px/1 var(--font-sans, sans-serif);
+}
+
+.ll-layout-2 { align-items: stretch; text-align: left; }
+.ll-layout-2 .ll-title { align-self: flex-start; text-align: left; }
+.ll-layout-2 .ll-container { align-items: center; width: 100%; }
+.ll-layout-2 .ll-left { display: flex; align-items: center; }
+.ll-layout-2 .ll-right { display: flex; align-items: center; }
+.ll-layout-2 .ll-panel { min-width: 0; width: 100%; }
+
+.ll-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.ll-capability-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid var(--ll-line);
+  border-radius: 10px;
+  background: var(--ll-surface-2);
+}
+.ll-capability-index {
+  color: var(--accent);
+  font: 700 14px/1 var(--font-mono, monospace);
+}
+.ll-capability-card strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ll-text);
+  font-size: 19px;
+}
+.ll-capability-card small {
+  display: block;
+  color: var(--ll-muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.ll-capability-card:last-child { grid-column: auto; }
+.ll-layout-2 .ll-tasks { width: 390px; }
+.ll-layout-2 .ll-tasks-list li { font-size: 16px; }
+
+.capability-evidence-slide { justify-content: flex-start; }
+.capability-evidence-frame { display: flex; align-items: center; justify-content: center; flex: 1 1 auto; min-height: 0; margin-top: 28px; padding: 16px; border: 1px solid var(--ll-line); border-radius: 12px; background: #171717; overflow: hidden; }
+.capability-evidence-frame img { display: block; width: 100%; height: 100%; max-height: 690px; object-fit: contain; border-radius: 6px; }
+.capability-evidence-grid-slide { min-height: 0; }
+.capability-evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); flex: 1 1 auto; min-height: 0; gap: 14px; margin-top: 24px; }
+.capability-evidence-grid figure { display: flex; align-items: center; justify-content: center; min-height: 0; margin: 0; padding: 10px; border: 1px solid var(--ll-line); border-radius: 10px; background: #171717; overflow: hidden; }
+.capability-evidence-grid img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+.skillshub-evidence-slide .capability-evidence-frame { margin-top: 20px; }
+.preslide-budget-slide { align-items: center; justify-content: center; padding: 0 !important; background: var(--bg) !important; }
+.preslide-budget-slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.skillshub-evidence-slide .skillshub-reference-url { align-self: center; margin-top: 16px; font-size: 15px; }
+
+.ll-tasks {
+  min-width: 390px;
+  padding: 24px;
+  border: 2px solid var(--ll-magenta);
+  border-radius: 14px;
+  background: var(--ll-surface-2);
+}
+.ll-tasks-title { margin: 0 0 16px; color: var(--ll-magenta); font-size: 19px; font-weight: 700; }
+.ll-tasks-list { list-style: none; margin: 0; padding: 0; }
+.ll-tasks-list li { display: flex; gap: 10px; margin: 0 0 13px; color: var(--ll-text); font-size: 17px; line-height: 1.3; }
+.ll-tasks-list li:last-child { margin-bottom: 0; }
+.ll-tasks-list li::before { content: '→'; color: var(--accent); font-weight: 700; }
+
+.ll-platforms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.ll-platforms > div { min-width: 0; }
+.ll-platforms > div > div:first-child { margin-bottom: 8px; color: var(--ll-text); font-size: 17px; font-weight: 700; }
+.ll-models-compact { color: var(--ll-text); font: 15px/1.5 var(--font-mono, monospace); }
+.ll-models-compact .kind { margin-bottom: 8px; color: var(--accent); font: 700 13px/1.2 var(--font-sans, sans-serif); }
+
+.ll-layout-3 .ll-container { align-items: center; }
+.ll-layout-3 .ll-left { display: flex; flex-direction: column; align-items: center; }
+.ll-obs-box { min-width: 390px; margin-top: 18px; padding: 20px 24px; border: 2px solid var(--ll-amber); border-radius: 14px; background: var(--ll-surface); }
+.ll-obs-title { margin: 0 0 5px; font-size: 24px; font-weight: 700; }
+.ll-obs-sub { margin: 0; color: var(--ll-amber); font-size: 15px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ll-slide { transition: none !important; }
+  .platform-flow-step { transition: none; }
+}

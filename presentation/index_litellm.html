@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en" data-themes="tokyo-night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LiteLLM AI Gateway | Enexis</title>
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/fonts.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/base.css">
+  <link rel="stylesheet" id="theme-link" href="../.agents/skills/html-ppt/assets/themes/tokyo-night.css">
+  <link rel="stylesheet" href="../.agents/skills/html-ppt/assets/animations/animations.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg: #0B1020;
+      --surf: #131B31;
+      --surf2: #1A2540;
+      --text: #F3F6FF;
+      --muted: #B0BDD8;
+      --accent: #BDDB00;
+      --accent2: #DE0073;
+      --accent3: #FFBE78;
+      --line: #3A4A75;
+    }
+
+    .ll-slide {
+      background: linear-gradient(135deg, var(--bg) 0%, var(--surf) 100%) !important;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 2rem;
+      padding: 2rem !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ll-title {
+      font-size: 3.2rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .ll-box {
+      border: 3px solid var(--accent);
+      border-radius: 12px;
+      background: var(--surf2);
+      padding: 2rem 3rem;
+      min-width: 400px;
+    }
+
+    .ll-box-title { font-size: 2.4rem; font-weight: 700; margin: 0 0 0.5rem 0; }
+    .ll-box-sub { font-size: 1.1rem; color: var(--accent); margin: 0; }
+
+    .ll-container {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .ll-left { flex: 0 0 auto; }
+    .ll-right { flex: 1; display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .ll-panel {
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      background: var(--surf);
+      padding: 2rem;
+      text-align: left;
+    }
+
+    .ll-panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0 0 1rem 0;
+    }
+
+    .ll-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surf2);
+      padding: 1.2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .ll-logo {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--bg);
+    }
+
+    .ll-card-content { flex: 1; text-align: left; }
+    .ll-card-name { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.3rem 0; }
+    .ll-card-models { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin: 0; }
+
+    .ll-link {
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-dasharray: 8, 4;
+      fill: none;
+    }
+
+    .ll-tasks {
+      border: 2px solid var(--accent2);
+      border-radius: 10px;
+      background: var(--surf2);
+      padding: 1.5rem;
+      min-width: 300px;
+      text-align: left;
+    }
+
+    .ll-tasks-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin: 0 0 1rem 0;
+    }
+
+    .ll-tasks-list { list-style: none; padding: 0; margin: 0; }
+    .ll-tasks-list li {
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+      color: var(--text);
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .ll-tasks-list li::before { content: '→'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .ll-tasks-list li:last-child { margin-bottom: 0; }
+
+    .ll-platforms { 
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .ll-models-compact {
+      font-family: 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .ll-models-compact .kind { 
+      font-weight: 700; 
+      color: var(--accent); 
+      font-size: 0.8rem; 
+      margin-bottom: 0.4rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ll-obs-box {
+      border: 2px solid var(--accent3);
+      border-radius: 10px;
+      background: var(--surf);
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1rem;
+      min-width: 300px;
+    }
+
+    .ll-obs-title { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.5rem 0; }
+    .ll-obs-sub { font-size: 0.95rem; color: var(--accent3); margin: 0; }
+
+    .ll-footnote {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .ll-layout-1 { flex-direction: row; }
+    .ll-layout-2 { flex-direction: row; gap: 2rem; justify-content: flex-start; }
+    .ll-layout-3 { flex-direction: row; }
+  </style>
+</head>
+<body class="tpl-workshop">
+<div class="deck">
+
+  <!-- Slide 1: Promise -->
+  <section class="slide" data-title="Promise">
+    <p class="kicker">03 / the rule for using AI</p>
+    <h2 class="h2">AI helps with tasks.<br><span class="muted">People make the decisions.</span></h2>
+    <div class="promise-grid mt-l">
+       <div class="promise-number">01</div><div><b>AI can speed up tasks</b><p>Context gathering, alternatives, starter code, test ideas, and review prompts.</p></div>
+       <div class="promise-number">02</div><div><b>People decide</b><p>Intent, boundaries, trade-offs, acceptance criteria, and output rules.</p></div>
+       <div class="promise-number">03</div><div><b>Checks and guardrails</b><p>Tests and review show what changed. Automatic quality gates keep AI-generated code within the team's standards.</p></div>
+       <div class="promise-number">04</div><div><b>Use resources responsibly</b><p>Choose the model and context for the task. Keep context small and do not use the most expensive model for every request.</p></div>
+    </div>
+    <div class="quote mt-l">AI can propose a change. The team decides whether it stays.</div>
+    <aside class="notes">
+       <p>Here is the rule for this session: <strong>AI helps with the work; people own the problem, the decisions, and the checks</strong>.</p>
+       <p>An agent is useful for gathering context, suggesting options, writing a first test, or finding a suspicious edge case. But the agent does not know which interpretation the business actually wants unless we make that visible. It also cannot decide whether an internal fixture field is safe to expose to an event coordinator.</p>
+       <p>So we will treat every generated result as a proposal. We keep a change when the behavior is written down, the implementation has tests, another person or tool has reviewed it, and automatic quality gates can run again.</p>
+       <p>There is also a cost to each request. Choose a model for the task, keep the context clean and small, and avoid spending the most expensive model and the most tokens when a smaller request will do.</p>
+    </aside>
+  </section>
+
+  <!-- Slide 2: AI Platform Team -->
+  <section class="slide platform-team-slide" data-title="AI Platform Team introduction">
+    <p class="kicker">Meet the team</p>
+    <h2 class="h2">AI Platform Team<br><span class="accent-text">introduction.</span></h2>
+    <ul class="platform-team-names mt-l" aria-label="AI Platform Team members">
+      <li>Dennis van Dijk</li>
+      <li>Folkert Jansen</li>
+      <li>Jeffrey van der Linden</li>
+      <li>Jim Kroon</li>
+      <li>Joost Franssen <small>(call him Frans, please)</small></li>
+    </ul>
+    <aside class="notes"><p>Introduce the AI Platform Team before the platform section. Members: Dennis van Dijk, Folkert Jansen, Jeffrey van der Linden, Jim Kroon, and Joost Franssen. Call Joost Frans.</p></aside>
+  </section>
+
+  <!-- Slide 3: Overview -->
+  <section class="slide ll-slide ll-layout-1" data-title="LiteLLM: One entry point for AI">
+    <h1 class="ll-title">One entry point for AI</h1>
+    <div class="ll-container">
+      <div class="ll-left">
+        <div class="ll-box">
+          <div class="ll-box-title">LiteLLM</div>
+          <div class="ll-box-sub">AI Gateway</div>
+        </div>
+      </div>
+      
+      <svg width="100" height="2" style="fill: none;">
+        <line x1="0" y1="1" x2="100" y2="1" stroke="var(--accent)" stroke-width="2" stroke-dasharray="8,4"/>
+      </svg>
+
+      <div class="ll-right" style="flex: 0 0 auto;">
+        <div class="ll-panel">
+          <div class="ll-panel-title">Cloud and model platforms</div>
+          
+          <div class="ll-card">
+            <div class="ll-logo">A</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">Microsoft Azure</div>
+            </div>
+          </div>
+
+          <div class="ll-card">
+            <div class="ll-logo">AWS</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">AWS Bedrock</div>
+            </div>
+          </div>
+
+          <div class="ll-card">
+            <div class="ll-logo">M</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">Mistral</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ll-footnote">Approved models only, exposed through one gateway</div>
+    <aside class="notes">Slide 3: Overview. Users and tools connect to LiteLLM. Behind it, we expose approved models from Azure, AWS Bedrock and Mistral.</aside>
+  </section>
+
+  <!-- Slide 4: Zoom in -->
+  <section class="slide ll-slide ll-layout-2" data-title="LiteLLM: Zoom in">
+    <h1 class="ll-title">Zoom in: behind the gateway</h1>
+    <div class="ll-container">
+      
+      <div class="ll-left">
+        <div class="ll-tasks">
+          <div class="ll-tasks-title">What I do as Platform Engineer</div>
+          <ul class="ll-tasks-list">
+            <li>Request and approve model access</li>
+            <li>Request and monitor quota</li>
+            <li>Configure aliases and routing</li>
+            <li>Set PII guardrails</li>
+            <li>Track usage and cost</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ll-right">
+        <div class="ll-panel">
+          <div class="ll-panel-title">Cloud and model platforms</div>
+          <div class="ll-platforms">
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">Microsoft Azure</div>
+              <div class="ll-models-compact">
+                <div class="kind">Router + direct models</div>
+                gpt-router<br>gpt-5.6-luna<br>gpt-6-luna<br>gpt-6-sol<br>gpt-6.1-sol
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">AWS Bedrock</div>
+              <div class="ll-models-compact">
+                <div class="kind">Router + direct models</div>
+                claude-router<br>claude-haiku-4.5<br>claude-sonnet-4.6-bedrock<br>claude-haiku-4.5-bedrock<br>claude-sonnet-5-bedrock<br>claude-sonnet-5.5-bedrock
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">Mistral</div>
+              <div class="ll-models-compact">
+                <div class="kind">Specialised models</div>
+                mistral-zai-glm-5-3
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ll-footnote">Model snapshot October 2026. All approved models. Verify aliases before presenting.</div>
+    <aside class="notes">Slide 4: Platform Engineer responsibilities and approved models per platform. Zoom shows what we manage and what we offer.</aside>
+  </section>
+
+  <!-- Slide 5: Back to overview with observability -->
+  <section class="slide ll-slide ll-layout-3" data-title="LiteLLM: One gateway, full visibility">
+    <h1 class="ll-title">One gateway, full visibility</h1>
+    <div class="ll-container">
+      <div class="ll-left">
+        <div class="ll-box">
+          <div class="ll-box-title">LiteLLM</div>
+          <div class="ll-box-sub">AI Gateway</div>
+        </div>
+        
+        <div class="ll-obs-box">
+          <div class="ll-obs-title">Logs and Observability</div>
+          <div class="ll-obs-sub">Monitoring, cost and usage</div>
+        </div>
+      </div>
+      
+      <svg width="100" height="2" style="fill: none;">
+        <line x1="0" y1="1" x2="100" y2="1" stroke="var(--accent)" stroke-width="2" stroke-dasharray="8,4"/>
+      </svg>
+
+      <div class="ll-right" style="flex: 0 0 auto;">
+        <div class="ll-panel">
+          <div class="ll-panel-title">Cloud and model platforms</div>
+          
+          <div class="ll-card">
+            <div class="ll-logo">A</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">Microsoft Azure</div>
+            </div>
+          </div>
+
+          <div class="ll-card">
+            <div class="ll-logo">AWS</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">AWS Bedrock</div>
+            </div>
+          </div>
+
+          <div class="ll-card">
+            <div class="ll-logo">M</div>
+            <div class="ll-card-content">
+              <div class="ll-card-name">Mistral</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ll-footnote">Approved models only, exposed through one gateway</div>
+    <aside class="notes">Slide 5: Back to overview. Logs and Observability appears under LiteLLM for unified monitoring across all platforms.</aside>
+  </section>
+
+</div>
+
+<script src="../.agents/skills/html-ppt/assets/runtime.js"></script>
+</body>
+</html>
