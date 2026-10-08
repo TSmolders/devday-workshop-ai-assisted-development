@@ -97,28 +97,6 @@
     </aside>
   </section>
 
-  <section class="slide" data-title="Trust ladder">
-    <p class="kicker">05 / autonomy is earned</p>
-    <h2 class="h2">You cannot skip<br><span class="accent-text">the climb.</span></h2>
-    <div class="ladder mt-l">
-      <div class="ladder-steps">
-        <div class="rung r1"><i>1</i><b>Chat</b><span>Ask, copy, paste.</span></div>
-        <div class="rung r2"><i>2</i><b>Single agent</b><span>One agent writes code. No loop yet.</span></div>
-        <div class="rung r3 here"><i>3</i><b>In the loop</b><span>You steer every step. Skills and guards.</span><em>YOU ARE HERE</em></div>
-        <div class="rung r4"><i>4</i><b>On the loop</b><span>You supervise. The agent runs the loop.</span></div>
-        <div class="rung r5"><i>5</i><b>Software factory</b><span>Hundreds of agents, out of the loop.</span></div>
-      </div>
-      <div class="trust-bar"><span>LESS TRUST</span><div class="tb-line"><i></i></div><span>MORE TRUST</span><strong>As trust grows, you can climb the ladder.</strong></div>
-      <div class="ladder-skip"><b>The shortcut</b><span>Jump straight to the factory</span><i>→</i><span>AI slop + token burn</span><i>→</i><span>More credits + better model</span><i>→</i><strong>Still slop</strong></div>
-    </div>
-    <aside class="notes">
-      <p>One idea carries this whole workshop: <strong>autonomy is earned, not configured</strong>. Look at the five rungs. Chat. Then a single agent writing code for you. Then in-the-loop agentic coding, where you steer every step and the agent has skills and guards. Then on-the-loop, where you supervise an agent that runs the loop itself. And at the top, a software factory with hundreds or thousands of agents building for you.</p>
-      <p>You can build towards that factory. But you cannot start there. To step back from the loop, you first have to trust your agents, and that trust is built by the agents themselves, while you watch them work in the loop. The specs, skills, guards, and retros around them are what make that visible: the guard that catches a mistake, the review that confirms the result, the retro that fixes a repeated slip. Today we walk through exactly these building blocks, as an introduction. This workshop does not move you up a rung. That happens after today, when you build your own workflows into your tools and slowly tweak your skills and agents, so your agents can earn your trust over time.</p>
-      <p>If you jump straight to the top, you get AI slop and a large token bill. The usual reaction is more credits and a better model. That is rarely the problem. It is a setup problem. A more expensive model on a missing process just produces more expensive slop.</p>
-      <p>The bar under the ladder is the key: as trust grows, you can climb. Trust is something your agents build with you, not a model you buy. Today you work at rung three. That is where your agents get the chance to earn it.</p>
-    </aside>
-  </section>
-
   <section class="slide section-divider" data-title="Platform onboarding">
     <div class="section-number">05</div>
     <p class="kicker">platform section · owner: Jeffrey</p>
@@ -202,7 +180,7 @@
       <aside class="notes">Overview. Users and tools connect to LiteLLM. Behind it, we expose approved models from Azure, AWS Bedrock and Mistral.</aside>
     </section>
 
-    <!-- LiteLLM: Zoom in -->
+      <!-- LiteLLM: Zoom in -->
     <section class="slide ll-slide" data-title="LiteLLM: Zoom in">
       <p class="kicker">07 / behind the gateway</p>
       <h2 class="h2 ll-title">Zoom in: behind the <span class="accent-text">gateway</span>.</h2>
@@ -450,9 +428,31 @@ Do not change any files.</pre><div class="proof-row"><span class="proof-icon">�
        <p>First, confirm that the assigned key works. Second, clone the repository and open it in OpenCode V1. Third, restart OpenCode so the project configuration is loaded, then confirm Context7 is available. Fourth, ask the agent for a short description of the application. The prompt must not change any files.</p>
        <p>The smoke test checks access, repository visibility, agent operation, and the absence of an unintended diff. Finish the setup and smoke test before hands-on work starts. If you are blocked, ask a platform engineer in the GTG channel.</p>
     </aside>
+ </section>
+
+  <section class="slide" data-title="Trust ladder">
+    <p class="kicker">05 / autonomy is earned</p>
+    <h2 class="h2">You cannot skip<br><span class="accent-text">the climb.</span></h2>
+    <div class="ladder mt-l">
+      <div class="ladder-steps">
+        <div class="rung r1"><i>1</i><b>Chat</b><span>Ask, copy, paste.</span></div>
+        <div class="rung r2"><i>2</i><b>Single agent</b><span>One agent writes code. No loop yet.</span></div>
+        <div class="rung r3 here"><i>3</i><b>In the loop</b><span>You steer every step. Skills and guards.</span><em>YOU ARE HERE</em></div>
+        <div class="rung r4"><i>4</i><b>On the loop</b><span>You supervise. The agent runs the loop.</span></div>
+        <div class="rung r5"><i>5</i><b>Software factory</b><span>Hundreds of agents, out of the loop.</span></div>
+      </div>
+      <div class="trust-bar"><span>LESS TRUST</span><div class="tb-line"><i></i></div><span>MORE TRUST</span><strong>As trust grows, you can climb the ladder.</strong></div>
+      <div class="ladder-skip"><b>The shortcut</b><span>Jump straight to the factory</span><i>→</i><span>AI slop + token burn</span><i>→</i><span>More credits + better model</span><i>→</i><strong>Still slop</strong></div>
+    </div>
+    <aside class="notes">
+      <p>One idea carries this whole workshop: <strong>autonomy is earned, not configured</strong>. Look at the five rungs. Chat. Then a single agent writing code for you. Then in-the-loop agentic coding, where you steer every step and the agent has skills and guards. Then on-the-loop, where you supervise an agent that runs the loop itself. And at the top, a software factory with hundreds or thousands of agents building for you.</p>
+      <p>You can build towards that factory. But you cannot start there. To step back from the loop, you first have to trust your agents, and that trust is built by the agents themselves, while you watch them work in the loop. The specs, skills, guards, and retros around them are what make that visible: the guard that catches a mistake, the review that confirms the result, the retro that fixes a repeated slip. Today we walk through exactly these building blocks, as an introduction. This workshop does not move you up a rung. That happens after today, when you build your own workflows into your tools and slowly tweak your skills and agents, so your agents can earn your trust over time.</p>
+      <p>If you jump straight to the top, you get AI slop and a large token bill. The usual reaction is more credits and a better model. That is rarely the problem. It is a setup problem. A more expensive model on a missing process just produces more expensive slop.</p>
+      <p>The bar under the ladder is the key: as trust grows, you can climb. Trust is something your agents build with you, not a model you buy. Today you work at rung three. That is where your agents get the chance to earn it.</p>
+    </aside>
   </section>
 
-<section class="slide lifecycle-slide" data-title="Software lifecycle">
+ <section class="slide lifecycle-slide" data-title="Software lifecycle">
     <p class="kicker">13 / the software lifecycle</p>
     <h2 class="h2">A cycle, <br><span class="accent-text">not a prompt.</span></h2>
     <div class="life-legend mt-l">
